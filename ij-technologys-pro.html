@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IJ Technologys — We Build Websites &amp; Everything Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+/* ================= TOKENS (per UI/UX Pro Max: cinematic dark) ================= */
+:root{
+  --bg-deep:#04050F;          /* not pure black */
+  --bg-base:#070A1E;
+  --bg-elev:#0C1030;
+  --surface:rgba(255,255,255,.05);
+  --stroke:rgba(255,255,255,.08);
+  --text:#EEF0FF;
+  --muted:#9AA3D0;
+  --primary:#6C7BFF;
+  --violet:#A06BFF;
+  --cyan:#4BD8FF;
+  --amber:#FFB65C;
+  --grad:linear-gradient(100deg,var(--primary),var(--violet) 55%,var(--cyan));
+  --display:'Syne',sans-serif;
+  --body:'Sora',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --r:16px;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--body);color:var(--text);line-height:1.65;font-weight:300;
+  overflow-x:hidden;
+  background:linear-gradient(180deg,#0A0D26 0%,var(--bg-base) 30%,var(--bg-deep) 100%);
+}
+::selection{background:var(--primary);color:#fff}
+h1,h2,h3{font-family:var(--display);line-height:1.06;letter-spacing:-.015em}
+img{display:block;max-width:100%}
+.container{max-width:1220px;margin:0 auto;padding:0 clamp(20px,4vw,48px)}
+.grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.78rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.eyebrow::before{content:"";width:34px;height:1.5px;background:var(--grad);border-radius:2px}
+.sec-head{margin-bottom:56px}
+.sec-head h2{font-size:clamp(2.1rem,4.6vw,3.4rem);font-weight:800;margin-top:16px}
+.sec-head.center{text-align:center}
+.sec-head.center .eyebrow::before{display:none}
+.sec-head p.sub{color:var(--muted);max-width:560px;margin-top:14px}
+.sec-head.center p.sub{margin-left:auto;margin-right:auto}
+
+/* WebGL particle field sits behind everything */
+#bgCanvas{position:fixed;inset:0;z-index:-2;display:block}
+.vignette{position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 10%,transparent 40%,rgba(4,5,15,.75) 100%)}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(34px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.12s}.reveal.d2{transition-delay:.24s}.reveal.d3{transition-delay:.36s}
+
+/* ================= HEADER ================= */
+header{position:fixed;top:0;left:0;right:0;z-index:100;transition:background .35s,border-color .35s;border-bottom:1px solid transparent}
+header.scrolled{background:rgba(7,10,30,.72);backdrop-filter:blur(16px);border-color:var(--stroke)}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:18px clamp(20px,4vw,48px);max-width:1400px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none;font-family:var(--display);font-weight:800;font-size:1.22rem;color:var(--text)}
+.logo .mark{width:38px;height:38px;border-radius:12px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:.85rem;color:#fff;box-shadow:0 6px 24px rgba(108,123,255,.45)}
+.nav-links{display:flex;gap:34px;list-style:none}
+.nav-links a{text-decoration:none;font-size:.88rem;color:var(--muted);transition:color .25s var(--ease);position:relative}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;height:2px;width:0;background:var(--grad);border-radius:2px;transition:width .3s var(--ease)}
+.nav-links a:hover{color:var(--text)}
+.nav-links a:hover::after{width:100%}
+.nav-right{display:flex;align-items:center;gap:14px}
+.lang{display:flex;border:1px solid var(--stroke);border-radius:99px;overflow:hidden;background:var(--surface)}
+.lang button{font-family:var(--body);font-size:.74rem;font-weight:600;letter-spacing:.08em;padding:8px 15px;background:none;border:none;color:var(--muted);cursor:pointer;transition:.25s var(--ease)}
+.lang button.active{background:var(--grad);color:#fff}
+.burger{display:none;background:none;border:1px solid var(--stroke);border-radius:12px;width:44px;height:44px;cursor:pointer;flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.burger span{width:20px;height:2px;background:var(--text);border-radius:2px;transition:.3s var(--ease)}
+.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.open span:nth-child(2){opacity:0}
+.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mobile-menu{position:fixed;inset:0;z-index:99;background:rgba(4,5,15,.96);backdrop-filter:blur(20px);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+.mobile-menu.open{opacity:1;pointer-events:auto}
+.mobile-menu a{font-family:var(--display);font-weight:700;font-size:2rem;text-decoration:none;color:var(--text);padding:8px}
+
+/* ================= HERO ================= */
+.hero{padding:170px 0 110px;position:relative}
+.hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(2.6rem,5.6vw,4.5rem);font-weight:800;margin:22px 0 24px}
+.hero p.lead{color:var(--muted);font-size:1.08rem;max-width:540px}
+.cta-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:38px}
+.btn{font-family:var(--display);font-weight:700;font-size:.98rem;text-decoration:none;padding:16px 32px;border-radius:99px;display:inline-flex;align-items:center;gap:10px;transition:transform .3s var(--ease),box-shadow .3s var(--ease);border:1px solid var(--stroke);color:var(--text);background:var(--surface);backdrop-filter:blur(6px);cursor:pointer}
+.btn.primary{background:var(--grad);border:none;color:#fff;box-shadow:0 10px 34px rgba(108,123,255,.4)}
+.btn:hover{transform:translateY(-3px)}
+.btn.primary:hover{box-shadow:0 16px 44px rgba(108,123,255,.55)}
+.stats{display:flex;gap:44px;margin-top:52px;flex-wrap:wrap}
+.stat b{font-family:var(--display);font-weight:800;font-size:2rem;display:block}
+.stat span{font-size:.8rem;color:var(--muted)}
+
+/* 3D hero card */
+.hero3d{position:relative;height:560px;border-radius:24px}
+#cardCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+.card-overlay{
+  position:absolute;left:50%;top:50%;z-index:3;pointer-events:none;
+  transform:translate(-50%,-50%);text-align:center;width:min(70%,340px);
+  will-change:transform;
+}
+.card-overlay .co-mark{
+  width:58px;height:58px;border-radius:16px;background:var(--grad);margin:0 auto 18px;
+  display:flex;align-items:center;justify-content:center;font-family:var(--display);
+  font-weight:800;font-size:1.2rem;color:#fff;box-shadow:0 14px 40px rgba(108,123,255,.6);
+}
+.card-overlay h3{font-size:1.6rem;font-weight:800;text-shadow:0 4px 30px rgba(4,5,15,.8)}
+.card-overlay p{font-family:var(--mono);font-size:.72rem;color:var(--cyan);margin-top:8px;letter-spacing:.08em;text-shadow:0 2px 16px rgba(4,5,15,.9)}
+.hero3d .hint{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+  font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);opacity:.8;
+}
+
+/* services strip */
+.strip{border-block:1px solid var(--stroke);padding:20px 0;overflow:hidden;background:rgba(255,255,255,.02);backdrop-filter:blur(4px)}
+.strip-track{display:flex;gap:56px;width:max-content;animation:slide 30s linear infinite;font-family:var(--display);font-weight:700;font-size:1rem;color:var(--muted);white-space:nowrap}
+.strip-track span i{color:var(--primary);font-style:normal;margin-right:56px}
+@keyframes slide{to{transform:translateX(-50%)}}
+
+/* ================= GLOBE + PROJECTS ================= */
+.projects-wrap{height:430vh;position:relative}
+.projects-stage{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.projects-stage .sec-head{margin-bottom:0;z-index:6;text-align:center}
+.scroll-hint{z-index:6;display:flex;align-items:center;gap:10px;margin-top:10px;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);transition:opacity .5s var(--ease)}
+.scroll-hint .wheel{width:22px;height:34px;border:1.5px solid var(--muted);border-radius:99px;position:relative}
+.scroll-hint .wheel::after{content:"";position:absolute;left:50%;top:6px;width:3px;height:7px;margin-left:-1.5px;background:var(--cyan);border-radius:3px;animation:wheel 1.6s ease-in-out infinite}
+@keyframes wheel{0%{transform:translateY(0);opacity:1}100%{transform:translateY(12px);opacity:0}}
+.orbit-scene{position:relative;width:100%;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;perspective:1500px;perspective-origin:50% 40%}
+#globeCanvas{position:absolute;z-index:1}
+.ring{position:absolute;width:0;height:0;z-index:3;transform-style:preserve-3d;transform:rotateX(-5deg) rotateY(var(--rot,0deg));will-change:transform}
+.pcard{
+  --i:0;position:absolute;width:290px;left:-145px;top:-125px;
+  transform:rotateY(calc(var(--i)*60deg)) translateZ(var(--radius,470px));
+  backface-visibility:hidden;border-radius:var(--r);overflow:hidden;
+  border:1px solid var(--stroke);
+  background:linear-gradient(180deg,rgba(18,22,54,.9),rgba(8,10,30,.92));
+  box-shadow:0 26px 60px rgba(0,0,0,.55);
+}
+.pcard .thumb{height:160px;overflow:hidden;position:relative}
+.pcard .thumb img{width:100%;height:100%;object-fit:cover}
+.pcard .thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(8,10,30,.92))}
+.pcard .body{padding:16px 18px 18px}
+.pcard .tag{font-family:var(--mono);font-size:.64rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan)}
+.pcard h3{font-size:1.12rem;font-weight:700;margin:6px 0 4px}
+.pcard p{font-size:.78rem;color:var(--muted);line-height:1.5}
+
+/* ================= WORK / DESK ================= */
+.work{padding:150px 0 120px}
+.work-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+.desk-frame{border-radius:24px;border:1px solid var(--stroke);padding:34px 26px 14px;background:linear-gradient(180deg,rgba(18,22,54,.6),rgba(8,10,30,.6));backdrop-filter:blur(8px);position:relative;overflow:hidden}
+.desk-frame::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 50% at 40% 30%,rgba(108,123,255,.14),transparent 70%);pointer-events:none}
+.desk-frame svg{width:100%;height:auto;display:block}
+/* cartoon palette */
+.fl-desk{fill:#2B3474}.fl-desk2{fill:#1C2354}.fl-screen{fill:#0B0F2B}.fl-frame{fill:#39428C}
+.fl-skin{fill:#F2B98F}.fl-hair{fill:#33285E}.fl-shirt{fill:#6C7BFF}.fl-shirt2{fill:#5866E0}
+.fl-pants{fill:#2B3474}.fl-pants2{fill:#232A5E}.fl-chair{fill:#4335A0}.fl-plant{fill:#3FBF8F}.fl-pot{fill:#A06BFF}
+.limb{fill:none;stroke-linecap:round}
+/* -- timeline: 12s loop -- walk to center 0-30%, plop 30-35%, type 35-100% -- */
+#walker2{animation:walkIn2 12s linear infinite}
+@keyframes walkIn2{
+  0%{transform:translateX(250px)}
+  30%{transform:translateX(0)}
+  31%,100%{transform:translateX(0);opacity:0}
+  0%,30.9%{opacity:1}
+}
+/* bouncy cartoon step */
+#walker2 .wBounce{animation:wBounce 12s ease-in-out infinite}
+@keyframes wBounce{
+  0%,3.75%,7.5%,11.25%,15%,18.75%,22.5%,26.25%,30%,100%{transform:translateY(0)}
+  1.875%,5.625%,9.375%,13.125%,16.875%,20.625%,24.375%,28.125%{transform:translateY(-8px)}
+}
+#walker2 .wleg1{animation:wswingA 12s ease-in-out infinite}
+#walker2 .wleg2{animation:wswingB 12s ease-in-out infinite}
+#walker2 .warm1{animation:wswingB 12s ease-in-out infinite}
+#walker2 .warm2{animation:wswingA 12s ease-in-out infinite}
+@keyframes wswingA{0%{transform:rotate(28deg)}3.75%{transform:rotate(-28deg)}7.5%{transform:rotate(28deg)}11.25%{transform:rotate(-28deg)}15%{transform:rotate(28deg)}18.75%{transform:rotate(-28deg)}22.5%{transform:rotate(28deg)}26.25%{transform:rotate(-28deg)}30%,100%{transform:rotate(0)}}
+@keyframes wswingB{0%{transform:rotate(-28deg)}3.75%{transform:rotate(28deg)}7.5%{transform:rotate(-28deg)}11.25%{transform:rotate(28deg)}15%{transform:rotate(-28deg)}18.75%{transform:rotate(28deg)}22.5%{transform:rotate(-28deg)}26.25%{transform:rotate(28deg)}30%,100%{transform:rotate(0)}}
+/* head wobbles happily while walking */
+#walker2 .wHead{animation:wHead 12s ease-in-out infinite}
+@keyframes wHead{
+  0%,7.5%,15%,22.5%,30%,100%{transform:rotate(3deg)}
+  3.75%,11.25%,18.75%,26.25%{transform:rotate(-3deg)}
+}
+/* sitting figure appears and PLOPS into the chair with a cartoon bounce */
+#sitter2{opacity:0;animation:sitIn2 12s linear infinite}
+@keyframes sitIn2{0%,30.5%{opacity:0}31.5%,100%{opacity:1}}
+#sitter2 .plop{animation:plop 12s ease-out infinite}
+@keyframes plop{
+  0%,30.5%{transform:translateY(-26px)}
+  32.5%{transform:translateY(6px) scaleY(.94)}
+  33.8%{transform:translateY(-3px) scaleY(1.02)}
+  35%,100%{transform:translateY(0) scaleY(1)}
+}
+/* head bobs to the rhythm of typing */
+#sitter2 .headBob{animation:headBob 12s ease-in-out infinite}
+@keyframes headBob{
+  0%,36%,100%{transform:rotate(0)}
+  42%{transform:rotate(-2.5deg)}50%{transform:rotate(2deg)}
+  58%{transform:rotate(-2.5deg)}66%{transform:rotate(2deg)}
+  74%{transform:rotate(-2.5deg)}82%{transform:rotate(2deg)}
+  90%{transform:rotate(-1.5deg)}96%{transform:rotate(0)}
+}
+/* chair squish when he lands */
+#sitter2 .chairSquish{animation:chairSquish 12s ease-out infinite;transform-box:view-box;transform-origin:314px 276px}
+@keyframes chairSquish{0%,31.5%{transform:scaleY(1)}32.8%{transform:scaleY(.9)}34.2%{transform:scaleY(1.03)}35.5%,100%{transform:scaleY(1)}}
+/* typing arms */
+#sitter2 .tArm1{animation:type1 12s linear infinite}
+#sitter2 .tArm2{animation:type2 12s linear infinite}
+@keyframes type1{0%,36%{transform:rotate(0)}38%{transform:rotate(-8deg)}40%{transform:rotate(0)}42%{transform:rotate(-8deg)}44%{transform:rotate(0)}46%{transform:rotate(-8deg)}48%{transform:rotate(0)}50%{transform:rotate(-8deg)}52%{transform:rotate(0)}54%{transform:rotate(-8deg)}56%{transform:rotate(0)}58%{transform:rotate(-8deg)}60%{transform:rotate(0)}62%{transform:rotate(-8deg)}64%{transform:rotate(0)}66%{transform:rotate(-8deg)}68%{transform:rotate(0)}70%{transform:rotate(-8deg)}72%{transform:rotate(0)}74%{transform:rotate(-8deg)}76%{transform:rotate(0)}78%{transform:rotate(-8deg)}80%{transform:rotate(0)}82%{transform:rotate(-8deg)}84%{transform:rotate(0)}86%{transform:rotate(-8deg)}88%{transform:rotate(0)}90%{transform:rotate(-8deg)}92%,100%{transform:rotate(0)}}
+@keyframes type2{0%,37%{transform:rotate(0)}39%{transform:rotate(-8deg)}41%{transform:rotate(0)}43%{transform:rotate(-8deg)}45%{transform:rotate(0)}47%{transform:rotate(-8deg)}49%{transform:rotate(0)}51%{transform:rotate(-8deg)}53%{transform:rotate(0)}55%{transform:rotate(-8deg)}57%{transform:rotate(0)}59%{transform:rotate(-8deg)}61%{transform:rotate(0)}63%{transform:rotate(-8deg)}65%{transform:rotate(0)}67%{transform:rotate(-8deg)}69%{transform:rotate(0)}71%{transform:rotate(-8deg)}73%{transform:rotate(0)}75%{transform:rotate(-8deg)}77%{transform:rotate(0)}79%{transform:rotate(-8deg)}81%{transform:rotate(0)}83%{transform:rotate(-8deg)}85%{transform:rotate(0)}87%{transform:rotate(-8deg)}89%{transform:rotate(0)}91%,100%{transform:rotate(0)}}
+/* cartoon blink -- both figures */
+.eyes{animation:blink 3.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,90%,100%{transform:scaleY(1)}94%{transform:scaleY(.08)}}
+/* code appears line by line on the monitor */
+.codeL{stroke-linecap:round;stroke-width:6;stroke-dasharray:80;stroke-dashoffset:80}
+.codeL.k1{stroke:#4BD8FF;animation:codeA 12s linear infinite}
+.codeL.k2{stroke:#A06BFF;animation:codeB 12s linear infinite}
+.codeL.k3{stroke:#6C7BFF;animation:codeC 12s linear infinite}
+.codeL.k4{stroke:#FFB65C;animation:codeD 12s linear infinite}
+@keyframes codeA{0%,38%{stroke-dashoffset:80}48%,100%{stroke-dashoffset:0}}
+@keyframes codeB{0%,50%{stroke-dashoffset:80}60%,100%{stroke-dashoffset:0}}
+@keyframes codeC{0%,62%{stroke-dashoffset:80}72%,100%{stroke-dashoffset:0}}
+@keyframes codeD{0%,74%{stroke-dashoffset:80}84%,100%{stroke-dashoffset:0}}
+.screen-glow{animation:glow 12s linear infinite;opacity:0}
+@keyframes glow{0%,34%{opacity:0}40%,100%{opacity:1}}
+/* happy code symbols pop above the monitor while he types */
+.sym{opacity:0;font-family:var(--mono);font-weight:600;font-size:19px}
+.sym.s1{fill:#4BD8FF;animation:symPop1 12s ease-out infinite}
+.sym.s2{fill:#A06BFF;animation:symPop2 12s ease-out infinite}
+.sym.s3{fill:#FFB65C;animation:symPop3 12s ease-out infinite}
+@keyframes symPop1{0%,42%{opacity:0;transform:translateY(8px)}46%{opacity:1;transform:translateY(-6px)}56%{opacity:0;transform:translateY(-20px)}100%{opacity:0}}
+@keyframes symPop2{0%,58%{opacity:0;transform:translateY(8px)}62%{opacity:1;transform:translateY(-6px)}72%{opacity:0;transform:translateY(-20px)}100%{opacity:0}}
+@keyframes symPop3{0%,76%{opacity:0;transform:translateY(8px)}80%{opacity:1;transform:translateY(-6px)}90%{opacity:0;transform:translateY(-20px)}100%{opacity:0}}
+/* mug steam wiggle */
+.steam{stroke:#A06BFF;stroke-width:3.5;fill:none;stroke-linecap:round;stroke-dasharray:4 7;animation:steam 3s linear infinite}
+@keyframes steam{to{stroke-dashoffset:-44}}
+.work-copy h2{font-size:clamp(2rem,4.2vw,3.1rem);margin:16px 0 20px;font-weight:800}
+.work-copy p{color:var(--muted);max-width:500px;margin-bottom:16px}
+.feature-list{list-style:none;margin-top:26px;display:grid;gap:14px}
+.feature-list li{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:var(--r);border:1px solid var(--stroke);background:var(--surface);font-size:.9rem}
+.feature-list .ic{flex-shrink:0;width:34px;height:34px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center}
+.feature-list .ic svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ================= CLIENTS ================= */
+.clients{padding:60px 0 130px;overflow:hidden}
+.marquee{display:flex;gap:26px;width:max-content;animation:slide 40s linear infinite;padding:14px 0}
+.marquee:hover{animation-play-state:paused}
+.tcard{width:350px;flex-shrink:0;padding:28px;border-radius:20px;border:1px solid var(--stroke);background:linear-gradient(180deg,rgba(18,22,54,.7),rgba(8,10,30,.7));backdrop-filter:blur(8px);transition:transform .3s var(--ease),border-color .3s var(--ease)}
+.tcard:hover{transform:translateY(-6px);border-color:rgba(108,123,255,.4)}
+.tcard .stars{color:var(--amber);letter-spacing:3px;font-size:1rem}
+.tcard p{font-size:.92rem;margin:14px 0 20px}
+.tcard .who{display:flex;align-items:center;gap:14px}
+.tcard .who img{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid rgba(108,123,255,.5)}
+.tcard .who b{font-size:.9rem;display:block;font-weight:600}
+.tcard .who span{font-size:.76rem;color:var(--muted)}
+
+/* ================= OFFERS ================= */
+.offers{padding:40px 0 140px}
+.offer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:10px;align-items:stretch}
+.plan{padding:38px 32px;border-radius:24px;border:1px solid var(--stroke);background:linear-gradient(180deg,rgba(18,22,54,.65),rgba(8,10,30,.65));position:relative;display:flex;flex-direction:column;transition:transform .3s var(--ease),border-color .3s var(--ease)}
+.plan:hover{transform:translateY(-8px);border-color:rgba(108,123,255,.45)}
+.plan.pro{background:linear-gradient(180deg,rgba(44,52,118,.85),rgba(18,22,54,.9));border:1.5px solid rgba(108,123,255,.6);box-shadow:0 30px 80px rgba(108,123,255,.22)}
+.plan .flag{position:absolute;top:-15px;left:50%;transform:translateX(-50%);background:var(--grad);font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:7px 18px;border-radius:99px;white-space:nowrap}
+.plan h3{font-size:1.35rem;font-weight:800}
+.plan .price{font-family:var(--display);font-weight:800;font-size:2.3rem;margin:14px 0 2px}
+.plan .per{font-size:.78rem;color:var(--muted);margin-bottom:26px}
+.plan ul{list-style:none;margin-bottom:32px;display:grid;gap:12px;flex:1}
+.plan li{font-size:.88rem;color:var(--muted);display:flex;gap:11px;align-items:flex-start}
+.plan li::before{content:"✓";color:var(--cyan);font-weight:600;flex-shrink:0}
+.plan .btn{justify-content:center}
+
+/* ================= SUIT ================= */
+.suit{padding:20px 0 150px}
+.suit-inner{border-radius:28px;overflow:hidden;position:relative;display:grid;grid-template-columns:1fr 1fr;min-height:480px;border:1px solid var(--stroke)}
+.suit-img{position:relative;min-height:320px}
+.suit-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.suit-img::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 30%,rgba(7,9,26,.95))}
+.suit-copy{padding:clamp(36px,5vw,72px);display:flex;flex-direction:column;justify-content:center;background:linear-gradient(180deg,rgba(18,22,54,.85),rgba(6,8,22,.95))}
+.suit-copy h2{font-size:clamp(1.9rem,3.8vw,2.9rem);font-weight:800;margin:16px 0 20px}
+.suit-copy p{color:var(--muted);margin-bottom:16px;max-width:480px}
+.suit-copy .btn{align-self:flex-start;margin-top:14px}
+
+/* ================= FOOTER ================= */
+footer{border-top:1px solid var(--stroke);background:rgba(4,5,15,.8);padding:70px 0 40px;backdrop-filter:blur(6px)}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:44px}
+.foot-grid p{color:var(--muted);font-size:.88rem;max-width:300px;margin-top:16px}
+.foot-col h4{font-family:var(--display);font-size:.95rem;font-weight:700;margin-bottom:16px}
+.foot-col a{display:flex;align-items:center;gap:10px;color:var(--muted);text-decoration:none;font-size:.9rem;margin-bottom:12px;transition:color .25s var(--ease)}
+.foot-col a:hover{color:var(--text)}
+.foot-col .ic{width:32px;height:32px;border-radius:9px;background:var(--surface);border:1px solid var(--stroke);display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.foot-note{margin-top:56px;padding-top:26px;border-top:1px solid var(--stroke);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:.8rem}
+
+/* ================= RESPONSIVE ================= */
+@media(max-width:1020px){
+  .nav-links{display:none}.burger{display:flex}
+  .hero-grid,.work-grid{grid-template-columns:1fr}
+  .hero3d{height:440px}
+  .offer-grid{grid-template-columns:1fr;max-width:460px;margin:10px auto 0}
+  .suit-inner{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .pcard{width:230px;left:-115px;top:-110px}
+}
+@media(max-width:560px){
+  .hero{padding-top:130px}.stats{gap:26px}
+  .hero3d{height:380px}
+  .pcard{width:190px;left:-95px;top:-100px}
+  .pcard .thumb{height:110px}
+  .pcard p{display:none}
+  .foot-grid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<canvas id="bgCanvas" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+
+<!-- ================= HEADER ================= -->
+<header id="header">
+  <nav class="nav">
+    <a class="logo" href="#top"><span class="mark">IJ</span><span>Technologys</span></a>
+    <ul class="nav-links">
+      <li><a href="#about" data-en="About" data-sq="Rreth nesh">About</a></li>
+      <li><a href="#projects" data-en="Projects" data-sq="Projektet">Projects</a></li>
+      <li><a href="#work" data-en="How we work" data-sq="Si punojmë">How we work</a></li>
+      <li><a href="#clients" data-en="Clients" data-sq="Klientët">Clients</a></li>
+      <li><a href="#offers" data-en="Pricing" data-sq="Çmimet">Pricing</a></li>
+      <li><a href="#contact" data-en="Contact" data-sq="Kontakt">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="lang">
+        <button id="btn-sq" onclick="setLang('sq')">ALB</button>
+        <button id="btn-en" class="active" onclick="setLang('en')">ENG</button>
+      </div>
+      <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</header>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" data-en="About" data-sq="Rreth nesh">About</a>
+  <a href="#projects" data-en="Projects" data-sq="Projektet">Projects</a>
+  <a href="#work" data-en="How we work" data-sq="Si punojmë">How we work</a>
+  <a href="#clients" data-en="Clients" data-sq="Klientët">Clients</a>
+  <a href="#offers" data-en="Pricing" data-sq="Çmimet">Pricing</a>
+  <a href="#contact" data-en="Contact" data-sq="Kontakt">Contact</a>
+</div>
+
+<main id="top">
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="about">
+  <div class="container hero-grid">
+    <div class="reveal in">
+      <span class="eyebrow" data-en="Web studio · design + code + everything digital" data-sq="Studio web · dizajn + kod + gjithçka dixhitale">Web studio · design + code + everything digital</span>
+      <h1>
+        <span data-en="Make your dreams come true with" data-sq="Bëji ëndrrat e tua realitet me">Make your dreams come true with</span>
+        <span class="grad-text">IJ Technologys.</span>
+      </h1>
+      <p class="lead" data-en="We design and build websites, online shops and custom digital products that don't just sit there — they move, react and sell. From the first idea to launch day, one team handles everything."
+         data-sq="Ne projektojmë dhe ndërtojmë faqe interneti, dyqane online dhe produkte dixhitale të personalizuara që nuk rrinë thjesht aty — ato lëvizin, reagojnë dhe shesin. Nga ideja e parë deri në ditën e nisjes, një ekip i vetëm kujdeset për gjithçka.">
+        We design and build websites, online shops and custom digital products that don't just sit there — they move, react and sell. From the first idea to launch day, one team handles everything.
+      </p>
+      <div class="cta-row">
+        <a class="btn primary" href="#offers" data-en="See what we offer →" data-sq="Shiko çfarë ofrojmë →">See what we offer →</a>
+        <a class="btn" href="#projects" data-en="Spin our projects" data-sq="Rrotullo projektet">Spin our projects</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b class="grad-text" data-count="48">0</b><span data-en="projects launched" data-sq="projekte të nisura">projects launched</span></div>
+        <div class="stat"><b class="grad-text" data-count="31">0</b><span data-en="happy clients" data-sq="klientë të kënaqur">happy clients</span></div>
+        <div class="stat"><b class="grad-text" data-count="6">0</b><span data-en="countries reached" data-sq="vende të arritura">countries reached</span></div>
+      </div>
+    </div>
+    <div class="hero3d reveal in d1" id="hero3d">
+      <canvas id="cardCanvas"></canvas>
+      <div class="card-overlay" id="cardOverlay" aria-hidden="true">
+        <div class="co-mark">IJ</div>
+        <h3 data-en="Websites that move." data-sq="Faqe që lëvizin.">Websites that move.</h3>
+        <p>&lt;built by="IJ Technologys" /&gt;</p>
+      </div>
+      <span class="hint" data-en="move your mouse" data-sq="lëviz mausin">move your mouse</span>
+    </div>
+  </div>
+</section>
+
+<!-- services strip -->
+<div class="strip" aria-hidden="true">
+  <div class="strip-track" id="strip">
+    <span data-en="Websites <i>◆</i> Online shops <i>◆</i> Web apps <i>◆</i> Booking systems <i>◆</i> Branding <i>◆</i> Hosting &amp; care <i>◆</i> SEO <i>◆</i> 3D &amp; animations <i>◆</i>"
+          data-sq="Faqe interneti <i>◆</i> Dyqane online <i>◆</i> Aplikacione web <i>◆</i> Sisteme rezervimi <i>◆</i> Branding <i>◆</i> Hostim &amp; mirëmbajtje <i>◆</i> SEO <i>◆</i> 3D &amp; animacione <i>◆</i>">Websites <i>◆</i> Online shops <i>◆</i> Web apps <i>◆</i> Booking systems <i>◆</i> Branding <i>◆</i> Hosting &amp; care <i>◆</i> SEO <i>◆</i> 3D &amp; animations <i>◆</i></span>
+  </div>
+</div>
+
+<!-- ================= GLOBE + PROJECTS ================= -->
+<section class="projects-wrap" id="projects">
+  <div class="projects-stage">
+    <div class="sec-head center">
+      <span class="eyebrow" data-en="Built by us · seen everywhere" data-sq="Ndërtuar nga ne · parë kudo">Built by us · seen everywhere</span>
+      <h2 data-en="Our projects orbit the globe" data-sq="Projektet tona rrotullohen rreth globit">Our projects orbit the <span class="grad-text">globe</span></h2>
+    </div>
+    <span class="scroll-hint" id="scrollHint">
+      <span class="wheel"></span>
+      <span data-en="scroll to spin them" data-sq="lëviz poshtë për t'i rrotulluar">scroll to spin them</span>
+    </span>
+    <div class="orbit-scene" id="orbitScene">
+      <canvas id="globeCanvas" aria-hidden="true"></canvas>
+      <div class="ring" id="ring">
+        <article class="pcard" style="--i:0">
+          <div class="thumb"><img loading="lazy" src="https://picsum.photos/seed/ijp1/580/360" alt="Buna Market"></div>
+          <div class="body"><span class="tag" data-en="online shop" data-sq="dyqan online">online shop</span><h3>Buna Market</h3>
+          <p data-en="Full e-commerce with cart, card payments and live delivery tracking." data-sq="E-commerce i plotë me shportë, pagesa me kartë dhe gjurmim dërgesash.">Full e-commerce with cart, card payments and live delivery tracking.</p></div>
+        </article>
+        <article class="pcard" style="--i:1">
+          <div class="thumb"><img loading="lazy" src="https://picsum.photos/seed/ijp2/580/360" alt="Alpet Stay"></div>
+          <div class="body"><span class="tag" data-en="booking system" data-sq="sistem rezervimesh">booking system</span><h3>Alpet Stay</h3>
+          <p data-en="Guesthouse booking platform with live calendar and instant confirmation." data-sq="Platformë rezervimesh me kalendar dhe konfirmim të çastit.">Guesthouse booking platform with live calendar and instant confirmation.</p></div>
+        </article>
+        <article class="pcard" style="--i:2">
+          <div class="thumb"><img loading="lazy" src="https://picsum.photos/seed/ijp3/580/360" alt="Tavolina 12"></div>
+          <div class="body"><span class="tag" data-en="restaurant" data-sq="restorant">restaurant</span><h3>Tavolina 12</h3>
+          <p data-en="Animated menu, table reservations and a gallery that sells the vibe." data-sq="Menu e animuar, rezervime tavoline dhe një galeri që shet atmosferën.">Animated menu, table reservations and a gallery that sells the vibe.</p></div>
+        </article>
+        <article class="pcard" style="--i:3">
+          <div class="thumb"><img loading="lazy" src="https://picsum.photos/seed/ijp4/580/360" alt="Nord Logistics"></div>
+          <div class="body"><span class="tag" data-en="business portal" data-sq="portal biznesi">business portal</span><h3>Nord Logistics</h3>
+          <p data-en="Fleet dashboard and client area, fully bilingual and mobile-ready." data-sq="Panel flote dhe zonë klientësh, plotësisht dygjuhëshe.">Fleet dashboard and client area, fully bilingual and mobile-ready.</p></div>
+        </article>
+        <article class="pcard" style="--i:4">
+          <div class="thumb"><img loading="lazy" src="https://picsum.photos/seed/ijp5/580/360" alt="Studio Drin"></div>
+          <div class="body"><span class="tag" data-en="portfolio" data-sq="portofol">portfolio</span><h3>Studio Drin</h3>
+          <p data-en="A scroll-animated portfolio that made a photographer's work impossible to skip." data-sq="Portofol i animuar me scroll që e bën punën e fotografit të pamundur për t'u anashkaluar.">A scroll-animated portfolio that made a photographer's work impossible to skip.</p></div>
+        </article>
+        <article class="pcard" style="--i:5">
+          <div class="thumb"><img loading="lazy" src="https://picsum.photos/seed/ijp6/580/360" alt="Faturo"></div>
+          <div class="body"><span class="tag" data-en="web app" data-sq="aplikacion web">web app</span><h3>Faturo</h3>
+          <p data-en="Invoicing tool for small businesses — create, send and track in seconds." data-sq="Mjet faturimi për biznese të vogla — krijo, dërgo dhe gjurmo në sekonda.">Invoicing tool for small businesses — create, send and track in seconds.</p></div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WORK / DESK ================= -->
+<section class="work" id="work">
+  <div class="container work-grid">
+    <div class="desk-frame reveal" aria-hidden="true">
+      <svg viewBox="0 0 560 380">
+        <!-- floor -->
+        <rect x="24" y="330" width="512" height="5" rx="2.5" fill="#1C2354"/>
+        <ellipse cx="280" cy="333" rx="200" ry="6" fill="#12173E"/>
+        <!-- plant (right corner) -->
+        <g>
+          <path class="fl-plant" d="M486 252 q-22 -36 4 -62 q7 32 9 62 q11 -32 33 -43 q-5 34 -24 49 Z"/>
+          <path class="fl-pot" d="M470 256 h58 l-9 50 q-20 9 -41 0 Z"/>
+          <ellipse cx="499" cy="256" rx="29" ry="6" fill="#8B54E8"/>
+        </g>
+        <!-- desk (shifted left so the character sits at the CENTER of the frame) -->
+        <rect class="fl-desk" x="74" y="210" width="252" height="18" rx="9"/>
+        <rect class="fl-desk2" x="90" y="228" width="16" height="102" rx="6"/>
+        <rect class="fl-desk2" x="296" y="228" width="16" height="102" rx="6"/>
+        <g>
+          <rect class="fl-desk2" x="106" y="234" width="72" height="70" rx="10"/>
+          <rect x="122" y="254" width="40" height="6" rx="3" fill="#414BA0"/>
+          <rect x="122" y="276" width="40" height="6" rx="3" fill="#414BA0"/>
+        </g>
+        <!-- monitor with code -->
+        <g>
+          <rect class="fl-frame" x="118" y="78" width="176" height="116" rx="16"/>
+          <rect class="fl-screen" x="128" y="88" width="156" height="96" rx="10"/>
+          <rect class="screen-glow" x="128" y="88" width="156" height="96" rx="10" fill="url(#glowGrad)" opacity="0"/>
+          <rect class="fl-frame" x="196" y="194" width="18" height="12"/>
+          <rect class="fl-frame" x="172" y="204" width="66" height="9" rx="4.5"/>
+          <line class="codeL k1" x1="142" y1="108" x2="212" y2="108"/>
+          <line class="codeL k2" x1="154" y1="128" x2="262" y2="128"/>
+          <line class="codeL k3" x1="154" y1="148" x2="232" y2="148"/>
+          <line class="codeL k4" x1="142" y1="168" x2="268" y2="168"/>
+          <!-- popping symbols while typing -->
+          <text class="sym s1" x="300" y="82">{ }</text>
+          <text class="sym s2" x="258" y="60">&lt;/&gt;</text>
+          <text class="sym s3" x="330" y="56">✦</text>
+        </g>
+        <defs>
+          <linearGradient id="glowGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#6C7BFF" stop-opacity=".25"/>
+            <stop offset="1" stop-color="#4BD8FF" stop-opacity=".12"/>
+          </linearGradient>
+        </defs>
+        <!-- keyboard + mug -->
+        <rect x="244" y="200" width="58" height="10" rx="5" fill="#39428C"/>
+        <g>
+          <rect x="200" y="184" width="26" height="26" rx="7" fill="#A06BFF"/>
+          <path d="M226 189 q11 3 0 15" stroke="#A06BFF" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          <path class="steam" d="M208 178 q-4 -8 2 -14"/>
+          <path class="steam" d="M218 178 q4 -8 -2 -14" style="animation-delay:-1.4s"/>
+        </g>
+
+        <!-- -- WALKING cartoon guy: bounces in from the right, stops at CENTER -- -->
+        <g id="walker2">
+          <g class="wBounce">
+            <!-- legs (chunky, round) -->
+            <g class="wleg1" style="transform-box:view-box;transform-origin:302px 258px">
+              <path class="limb" d="M302 258 L302 314" stroke="#2B3474" stroke-width="15"/>
+              <rect class="fl-hair" x="290" y="312" width="30" height="12" rx="6"/>
+            </g>
+            <g class="wleg2" style="transform-box:view-box;transform-origin:302px 258px">
+              <path class="limb" d="M302 258 L302 314" stroke="#232A5E" stroke-width="15"/>
+              <rect class="fl-hair" x="290" y="312" width="30" height="12" rx="6"/>
+            </g>
+            <!-- torso -->
+            <rect class="fl-shirt" x="282" y="186" width="40" height="80" rx="19"/>
+            <rect class="fl-shirt2" x="282" y="232" width="40" height="14" rx="7"/>
+            <!-- arms -->
+            <g class="warm1" style="transform-box:view-box;transform-origin:302px 198px">
+              <path class="limb" d="M302 198 L296 252" stroke="#5866E0" stroke-width="12"/>
+              <circle class="fl-skin" cx="296" cy="254" r="7"/>
+            </g>
+            <g class="warm2" style="transform-box:view-box;transform-origin:302px 198px">
+              <path class="limb" d="M302 198 L310 252" stroke="#6C7BFF" stroke-width="12"/>
+              <circle class="fl-skin" cx="310" cy="254" r="7"/>
+            </g>
+            <!-- big happy head, wobbling -->
+            <g class="wHead" style="transform-box:view-box;transform-origin:302px 178px">
+              <circle class="fl-skin" cx="302" cy="152" r="26"/>
+              <path class="fl-hair" d="M276 148 a26 26 0 0 1 52 0 q-2 -11 -10 -13 q-15 -11 -32 0 q-8 2 -10 13 Z"/>
+              <path class="fl-hair" d="M322 128 q8 -6 12 2 q-6 1 -9 5 Z"/>
+              <g class="eyes">
+                <circle cx="288" cy="150" r="3.4" fill="#1C2354"/>
+                <circle cx="302" cy="149" r="3.4" fill="#1C2354"/>
+              </g>
+              <path d="M286 163 q8 7 17 3" stroke="#C4855C" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <circle cx="311" cy="160" r="4.5" fill="#F2989B" opacity=".55"/>
+            </g>
+          </g>
+        </g>
+
+        <!-- -- SITTING cartoon guy at the CENTER: plops down, then types -- -->
+        <g id="sitter2">
+          <!-- office chair (squishes on landing) -->
+          <g class="chairSquish">
+            <rect class="fl-chair" x="336" y="188" width="16" height="88" rx="8"/>
+            <rect class="fl-chair" x="280" y="262" width="72" height="16" rx="8"/>
+            <rect class="fl-chair" x="308" y="276" width="14" height="38"/>
+            <path class="limb" d="M288 322 L315 306 L342 322" stroke="#4335A0" stroke-width="10"/>
+            <circle cx="288" cy="324" r="7" fill="#33285E"/>
+            <circle cx="342" cy="324" r="7" fill="#33285E"/>
+          </g>
+          <g class="plop">
+            <!-- legs tucked under the desk -->
+            <path class="limb" d="M306 258 L262 262 L262 312" stroke="#232A5E" stroke-width="15"/>
+            <rect class="fl-hair" x="242" y="310" width="30" height="12" rx="6"/>
+            <path class="limb" d="M310 260 L276 266 L276 314" stroke="#2B3474" stroke-width="15"/>
+            <rect class="fl-hair" x="256" y="312" width="30" height="12" rx="6"/>
+            <!-- torso -->
+            <rect class="fl-shirt" x="288" y="184" width="40" height="84" rx="19"/>
+            <rect class="fl-shirt2" x="288" y="234" width="40" height="14" rx="7"/>
+            <!-- typing arms reach the keyboard -->
+            <g class="tArm1" style="transform-box:view-box;transform-origin:296px 202px">
+              <path class="limb" d="M296 202 Q272 214 258 202" stroke="#5866E0" stroke-width="12"/>
+              <circle class="fl-skin" cx="257" cy="202" r="7"/>
+            </g>
+            <g class="tArm2" style="transform-box:view-box;transform-origin:296px 212px">
+              <path class="limb" d="M296 212 Q276 226 264 212" stroke="#6C7BFF" stroke-width="12"/>
+              <circle class="fl-skin" cx="263" cy="212" r="7"/>
+            </g>
+            <!-- big head bobbing to the typing beat -->
+            <g class="headBob" style="transform-box:view-box;transform-origin:308px 176px">
+              <circle class="fl-skin" cx="308" cy="150" r="26"/>
+              <path class="fl-hair" d="M282 146 a26 26 0 0 1 52 0 q-2 -11 -10 -13 q-15 -11 -32 0 q-8 2 -10 13 Z"/>
+              <path class="fl-hair" d="M328 126 q8 -6 12 2 q-6 1 -9 5 Z"/>
+              <!-- headphones -->
+              <path d="M284 142 a24 24 0 0 1 48 0" stroke="#33285E" stroke-width="5" fill="none" stroke-linecap="round"/>
+              <rect x="278" y="140" width="9" height="18" rx="4.5" fill="#4335A0"/>
+              <rect x="329" y="140" width="9" height="18" rx="4.5" fill="#4335A0"/>
+              <g class="eyes">
+                <circle cx="294" cy="148" r="3.4" fill="#1C2354"/>
+                <circle cx="308" cy="147" r="3.4" fill="#1C2354"/>
+              </g>
+              <path d="M292 161 q8 7 17 3" stroke="#C4855C" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <circle cx="317" cy="158" r="4.5" fill="#F2989B" opacity=".55"/>
+            </g>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <div class="work-copy reveal d1">
+      <span class="eyebrow" data-en="Someone is always at the desk" data-sq="Dikush është gjithmonë në tavolinë">Someone is always at the desk</span>
+      <h2 data-en="While you sleep, we build." data-sq="Ndërsa ti fle, ne ndërtojmë.">While you sleep, <span class="grad-text">we build.</span></h2>
+      <p data-en="Every project starts with a sketch and ends with something alive on the internet. In between: design, code, testing on every screen size, and a launch we handle together."
+         data-sq="Çdo projekt nis me një skicë dhe përfundon me diçka të gjallë në internet. Ndërmjet tyre: dizajni, kodi, testimi në çdo madhësi ekrani dhe një nisje që e bëjmë bashkë.">
+        Every project starts with a sketch and ends with something alive on the internet. In between: design, code, testing on every screen size, and a launch we handle together.
+      </p>
+      <ul class="feature-list">
+        <li><span class="ic"><svg viewBox="0 0 24 24"><path d="M13 2 L4 14 h6 l-1 8 9-12 h-6 z"/></svg></span><span data-en="Design, code, hosting and maintenance — one team, one place, zero headaches." data-sq="Dizajn, kod, hostim dhe mirëmbajtje — një ekip, një vend, zero kokëçarje.">Design, code, hosting and maintenance — one team, one place, zero headaches.</span></li>
+        <li><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12 h18 M12 3 c3 3 3 15 0 18 c-3 -3 -3 -15 0 -18"/></svg></span><span data-en="Two languages by default, more whenever you need them." data-sq="Dy gjuhë si standard, më shumë kurdo që të nevojiten.">Two languages by default, more whenever you need them.</span></li>
+        <li><span class="ic"><svg viewBox="0 0 24 24"><path d="M2 12 s3.5-6 10-6 10 6 10 6 -3.5 6-10 6 -10-6-10-6 z"/><circle cx="12" cy="12" r="2.6"/></svg></span><span data-en="You see live progress every week — not a surprise at the end." data-sq="E sheh progresin çdo javë — jo një surprizë në fund.">You see live progress every week — not a surprise at the end.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CLIENTS ================= -->
+<section class="clients" id="clients">
+  <div class="container sec-head center reveal">
+    <span class="eyebrow" data-en="Real people · real results" data-sq="Njerëz realë · rezultate reale">Real people · real results</span>
+    <h2 data-en="Happy clients" data-sq="Klientë të kënaqur">Happy <span class="grad-text">clients</span></h2>
+  </div>
+  <div class="marquee" id="marquee">
+    <div class="tcard"><span class="stars">★★★★★</span>
+      <p data-en="“They took a photo of a napkin drawing and gave us back a shop that sells while we sleep. Sales are up 60% since launch.”" data-sq="“Morën një foto të një vizatimi në pecetë dhe na kthyen një dyqan që shet ndërsa ne flemë. Shitjet janë rritur 60% që nga nisja.”">“They took a photo of a napkin drawing and gave us back a shop that sells while we sleep. Sales are up 60% since launch.”</p>
+      <div class="who"><img src="https://i.pravatar.cc/100?img=47" alt=""><span><b>Bora K.</b><span>Buna Market</span></span></div>
+    </div>
+    <div class="tcard"><span class="stars">★★★★★</span>
+      <p data-en="“Bookings doubled in the first season. Guests keep mentioning how smooth and beautiful the site feels on their phones.”" data-sq="“Rezervimet u dyfishuan në sezonin e parë. Vizitorët vazhdojnë të përmendin sa e rrjedhshme dhe e bukur ndihet faqja në telefon.”">“Bookings doubled in the first season. Guests keep mentioning how smooth and beautiful the site feels on their phones.”</p>
+      <div class="who"><img src="https://i.pravatar.cc/100?img=12" alt=""><span><b>Arben D.</b><span>Alpet Stay</span></span></div>
+    </div>
+    <div class="tcard"><span class="stars">★★★★★</span>
+      <p data-en="“Fast, honest and patient with our hundred changes. The animated menu is basically our best waiter now.”" data-sq="“Të shpejtë, të ndershëm dhe të duruar me qindra ndryshimet tona. Menuja e animuar është praktikisht kamarieri ynë më i mirë.”">“Fast, honest and patient with our hundred changes. The animated menu is basically our best waiter now.”</p>
+      <div class="who"><img src="https://i.pravatar.cc/100?img=32" alt=""><span><b>Teuta M.</b><span>Tavolina 12</span></span></div>
+    </div>
+    <div class="tcard"><span class="stars">★★★★★</span>
+      <p data-en="“One team for design, code and hosting. We finally stopped juggling three different companies for one website.”" data-sq="“Një ekip për dizajn, kod dhe hostim. Më në fund nuk vrapojmë pas tre kompanive të ndryshme për një faqe.”">“One team for design, code and hosting. We finally stopped juggling three different companies for one website.”</p>
+      <div class="who"><img src="https://i.pravatar.cc/100?img=68" alt=""><span><b>Nik P.</b><span>Nord Logistics</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= OFFERS ================= -->
+<section class="offers" id="offers">
+  <div class="container">
+    <div class="sec-head center reveal">
+      <span class="eyebrow" data-en="Pick your size — we tailor the rest" data-sq="Zgjidh masën — pjesën tjetër e qepim ne">Pick your size — we tailor the rest</span>
+      <h2 data-en="What we offer" data-sq="Çfarë ofrojmë">What we <span class="grad-text">offer</span></h2>
+      <p class="sub" data-en="Clear packages, clear prices, no surprises. Every plan includes responsive design, animations and our support after launch." data-sq="Paketa të qarta, çmime të qarta, pa surpriza. Çdo plan përfshin dizajn responsiv, animacione dhe suportin tonë pas nisjes.">Clear packages, clear prices, no surprises. Every plan includes responsive design, animations and our support after launch.</p>
+    </div>
+    <div class="offer-grid">
+      <div class="plan reveal">
+        <h3>Basic</h3>
+        <div class="price">€290</div>
+        <div class="per" data-en="one-time · delivered in ~2 weeks" data-sq="pagesë e vetme · dorëzim ~2 javë">one-time · delivered in ~2 weeks</div>
+        <ul>
+          <li data-en="One-page animated website" data-sq="Faqe interneti një-faqëshe e animuar">One-page animated website</li>
+          <li data-en="Mobile-first &amp; fast loading" data-sq="Së pari për celular &amp; hapje e shpejtë">Mobile-first &amp; fast loading</li>
+          <li data-en="Contact form, map &amp; socials" data-sq="Formular kontakti, hartë &amp; rrjete sociale">Contact form, map &amp; socials</li>
+          <li data-en="1 language" data-sq="1 gjuhë">1 language</li>
+        </ul>
+        <a class="btn" href="#contact" data-en="Start with Basic" data-sq="Nis me Basic">Start with Basic</a>
+      </div>
+      <div class="plan pro reveal d1">
+        <span class="flag" data-en="Most chosen" data-sq="Më i zgjedhuri">Most chosen</span>
+        <h3>Pro</h3>
+        <div class="price grad-text">€690</div>
+        <div class="per" data-en="one-time · delivered in ~4 weeks" data-sq="pagesë e vetme · dorëzim ~4 javë">one-time · delivered in ~4 weeks</div>
+        <ul>
+          <li data-en="Multi-page site with animations" data-sq="Faqe me shumë seksione dhe animacione">Multi-page site with animations</li>
+          <li data-en="Two languages (ALB / ENG)" data-sq="Dy gjuhë (SHQ / ENG)">Two languages (ALB / ENG)</li>
+          <li data-en="Booking or product catalogue" data-sq="Rezervime ose katalog produktesh">Booking or product catalogue</li>
+          <li data-en="Basic SEO + Google setup" data-sq="SEO bazë + konfigurim në Google">Basic SEO + Google setup</li>
+          <li data-en="1 year hosting included" data-sq="1 vit hostim i përfshirë">1 year hosting included</li>
+        </ul>
+        <a class="btn primary" href="#contact" data-en="Go Pro" data-sq="Kalo në Pro">Go Pro</a>
+      </div>
+      <div class="plan reveal d2">
+        <h3>Premium</h3>
+        <div class="price" data-en="Custom" data-sq="Me ofertë">Custom</div>
+        <div class="per" data-en="tailored scope &amp; timeline" data-sq="përmbajtje &amp; afate sipas nevojës">tailored scope &amp; timeline</div>
+        <ul>
+          <li data-en="Online shop or custom web app" data-sq="Dyqan online ose aplikacion i personalizuar">Online shop or custom web app</li>
+          <li data-en="Payments, accounts &amp; dashboards" data-sq="Pagesa, llogari &amp; panele kontrolli">Payments, accounts &amp; dashboards</li>
+          <li data-en="Unlimited languages" data-sq="Gjuhë pa kufi">Unlimited languages</li>
+          <li data-en="Priority support &amp; maintenance" data-sq="Suport me përparësi &amp; mirëmbajtje">Priority support &amp; maintenance</li>
+        </ul>
+        <a class="btn" href="#contact" data-en="Talk to us" data-sq="Fol me ne">Talk to us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SUIT ================= -->
+<section class="suit">
+  <div class="container">
+    <div class="suit-inner reveal">
+      <div class="suit-img"><img src="https://picsum.photos/seed/ijsuit/900/900" alt=""></div>
+      <div class="suit-copy">
+        <span class="eyebrow" data-en="Specialized" data-sq="Të specializuar">Specialized</span>
+        <h2 data-en="Tailor your website like a suit." data-sq="Qepe faqen tënde si një kostum.">Tailor your website <span class="grad-text">like a suit.</span></h2>
+        <p data-en="No two businesses have the same measurements, so we never sell the same website twice. We take your colours, your voice and your goals, cut everything to fit — and stitch every detail until it fits you and only you."
+           data-sq="Asnjë biznes nuk ka të njëjtat masa, prandaj ne nuk shesim kurrë dy herë të njëjtën faqe. Marrim ngjyrat e tua, zërin tënd dhe qëllimet e tua, e presim gjithçka sipas masës — dhe e qepim çdo detaj derisa të të rrijë ty dhe vetëm ty.">
+          No two businesses have the same measurements, so we never sell the same website twice. We take your colours, your voice and your goals, cut everything to fit — and stitch every detail until it fits you and only you.
+        </p>
+        <a class="btn primary" href="#contact" data-en="Get measured — it's free" data-sq="Merr masat — falas">Get measured — it's free</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer id="contact">
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <a class="logo" href="#top"><span class="mark">IJ</span><span>Technologys</span></a>
+        <p data-en="A web studio building websites, shops and digital tools that move — for businesses that want to be seen everywhere." data-sq="Një studio web që ndërton faqe, dyqane dhe mjete dixhitale që lëvizin — për biznese që duan të shihen kudo.">A web studio building websites, shops and digital tools that move — for businesses that want to be seen everywhere.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Instagram</h4>
+        <a href="https://instagram.com/ijtechnologys" target="_blank" rel="noopener"><span class="ic">◎</span>@ijtechnologys</a>
+      </div>
+      <div class="foot-col">
+        <h4>Email</h4>
+        <a href="mailto:hello@ijtechnologys.com"><span class="ic">✉</span>hello@ijtechnologys.com</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-en="Phone" data-sq="Telefon">Phone</h4>
+        <a href="tel:+355690000000"><span class="ic">✆</span>+355 69 000 0000</a>
+      </div>
+    </div>
+    <div class="foot-note">
+      <span data-en="© 2026 IJ Technologys. All rights reserved." data-sq="© 2026 IJ Technologys. Të gjitha të drejtat e rezervuara.">© 2026 IJ Technologys. All rights reserved.</span>
+      <span data-en="Designed &amp; built by ourselves — of course." data-sq="Dizenjuar &amp; ndërtuar nga ne vetë — natyrisht.">Designed &amp; built by ourselves — of course.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ===================== SHARED SETUP & PERF BUDGET ===================== */
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const IS_MOBILE = matchMedia('(max-width: 768px)').matches || navigator.maxTouchPoints > 1;
+const DPR = Math.min(window.devicePixelRatio || 1, IS_MOBILE ? 1.5 : 1.75);
+/* particle budget scales down on mobile to hold 60fps */
+const BUDGET = {
+  bgParticles : IS_MOBILE ? 550  : 1400,
+  globePoints : IS_MOBILE ? 650  : 1300,
+  corePoints  : IS_MOBILE ? 80   : 160,
+};
+const visible = { bg:true, card:false, globe:false };
+document.addEventListener('visibilitychange',()=>{ visible.bg = !document.hidden; });
+
+/* ===================== UI LOGIC (lang, menu, reveal, counters) ===================== */
+function setLang(lang){
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-en]').forEach(el=>{
+    const t = el.getAttribute('data-'+lang);
+    if(t) el.innerHTML = t;
+  });
+  document.getElementById('btn-en').classList.toggle('active', lang==='en');
+  document.getElementById('btn-sq').classList.toggle('active', lang==='sq');
+  try{localStorage.setItem('ij-lang',lang)}catch(e){}
+  buildMarquees();
+}
+const headerEl = document.getElementById('header');
+window.addEventListener('scroll',()=>headerEl.classList.toggle('scrolled',window.scrollY>30),{passive:true});
+const burger=document.getElementById('burger'), mmenu=document.getElementById('mobileMenu');
+burger.addEventListener('click',()=>{
+  const open=mmenu.classList.toggle('open');
+  burger.classList.toggle('open',open);burger.setAttribute('aria-expanded',open);
+});
+mmenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{mmenu.classList.remove('open');burger.classList.remove('open');}));
+
+const counterIO=new IntersectionObserver(es=>{es.forEach(en=>{
+  if(!en.isIntersecting)return;
+  const el=en.target,target=+el.dataset.count,t0=performance.now(),dur=1600;
+  (function tick(t){const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(target*e)+(p===1?'+':'');
+    if(p<1)requestAnimationFrame(tick);})(t0);
+  counterIO.unobserve(el);
+});},{threshold:.6});
+document.querySelectorAll('[data-count]').forEach(el=>counterIO.observe(el));
+
+function buildMarquees(){
+  ['strip','marquee'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    if(!el.dataset.orig)el.dataset.orig=el.innerHTML;else el.innerHTML=el.dataset.orig;
+    el.dataset.orig=el.innerHTML;el.innerHTML+=el.innerHTML;
+  });
+}
+buildMarquees();
+
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ===================== SCROLL-DRIVEN PROJECT RING ===================== */
+const wrap=document.getElementById('projects'),ring=document.getElementById('ring'),hint=document.getElementById('scrollHint');
+let ticking=false, globeSpeedBoost=0;
+function updateRing(){
+  const rect=wrap.getBoundingClientRect();
+  const total=wrap.offsetHeight-window.innerHeight;
+  const progress=Math.min(1,Math.max(0,-rect.top/total));
+  ring.style.setProperty('--rot',(-progress*720)+'deg');
+  hint.style.opacity=(progress>0.05&&progress<0.97)?'0':'1';
+  ticking=false;
+}
+window.addEventListener('scroll',()=>{
+  if(!ticking){requestAnimationFrame(updateRing);ticking=true;}
+  globeSpeedBoost=0.05;
+},{passive:true});
+updateRing();
+function setRadius(){
+  const w=window.innerWidth;
+  const r=w<=560?260:w<=1020?330:470;
+  document.querySelectorAll('.pcard').forEach(c=>c.style.setProperty('--radius',r+'px'));
+}
+setRadius();
+
+/* ===================== HELPERS: textures ===================== */
+/* soft round sprite for glowing particles */
+function makeDotTexture(color){
+  const c=document.createElement('canvas');c.width=c.height=64;
+  const g=c.getContext('2d');
+  const grd=g.createRadialGradient(32,32,0,32,32,32);
+  grd.addColorStop(0,color);grd.addColorStop(.35,color+'AA');grd.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=grd;g.fillRect(0,0,64,64);
+  return new THREE.CanvasTexture(c);
+}
+/* scrolling "source code" texture for the globe's core & rings */
+const CODE_WORDS=['const','let','=>','function(','return','if(','for(','await','async','fetch(','.then(','import','export','</div>','<nav>','useState(','.map(','&&','||','npm run build','git push','class=','display:flex','{ }','01101','render()','props.','.css','.tsx','SELECT *','while(','try{','catch(e)','new Promise','addEventListener','translate3d','requestAnimationFrame'];
+function makeCodeTexture(w,h,fontSize,dense){
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const g=c.getContext('2d');
+  g.clearRect(0,0,w,h);
+  g.font=`600 ${fontSize}px "JetBrains Mono",monospace`;
+  const lineH=fontSize*1.7, cols=['#4BD8FF','#6C7BFF','#A06BFF','#7FE8C1','#FFB65C'];
+  for(let y=lineH;y<h;y+=lineH){
+    let x=8+Math.random()*30;
+    while(x<w-40){
+      const word=CODE_WORDS[(Math.random()*CODE_WORDS.length)|0];
+      const bright=Math.random()<(dense?.3:.18);
+      g.fillStyle=bright?cols[(Math.random()*cols.length)|0]:'rgba(120,140,220,.42)';
+      g.fillText(word,x,y);
+      x+=g.measureText(word).width+fontSize*(1+Math.random()*1.6);
+    }
+  }
+  const t=new THREE.CanvasTexture(c);
+  t.wrapS=t.wrapT=THREE.RepeatWrapping;
+  return t;
+}
+
+/* ===================== SCENE 1: DRIFTING PARTICLE FIELD (background) ===================== */
+(function bgField(){
+  const canvas=document.getElementById('bgCanvas');
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:false,powerPreference:'low-power'});
+  renderer.setPixelRatio(DPR);
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(60,1,1,120);
+  cam.position.z=40;
+  function size(){renderer.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();}
+  size();addEventListener('resize',size);
+
+  const N=BUDGET.bgParticles;
+  const pos=new Float32Array(N*3), phase=new Float32Array(N);
+  for(let i=0;i<N;i++){
+    pos[i*3]  =(Math.random()-.5)*110;
+    pos[i*3+1]=(Math.random()-.5)*70;
+    pos[i*3+2]=(Math.random()-.5)*60;
+    phase[i]=Math.random()*Math.PI*2;
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const groups=[
+    {color:'#6C7BFF',size:IS_MOBILE?1.6:1.9,count:.6},
+    {color:'#4BD8FF',size:IS_MOBILE?1.2:1.4,count:.4},
+  ];
+  /* two point clouds sharing geometry ranges for two glow colors */
+  const clouds=groups.map((gr,gi)=>{
+    const start=gi===0?0:Math.floor(N*groups[0].count);
+    const end=gi===0?Math.floor(N*groups[0].count):N;
+    const sub=new THREE.BufferGeometry();
+    sub.setAttribute('position',new THREE.BufferAttribute(pos.slice(start*3,end*3),3));
+    const mat=new THREE.PointsMaterial({
+      size:gr.size,map:makeDotTexture(gr.color),transparent:true,opacity:.8,
+      depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true
+    });
+    const p=new THREE.Points(sub,mat);scene.add(p);return p;
+  });
+
+  let mx=0,my=0;
+  addEventListener('pointermove',e=>{mx=(e.clientX/innerWidth-.5);my=(e.clientY/innerHeight-.5);},{passive:true});
+
+  let t=0;
+  function frame(){
+    if(REDUCED){renderer.render(scene,cam);return;} /* single static frame */
+    requestAnimationFrame(frame);
+    if(!visible.bg)return;
+    t+=0.0016;
+    clouds.forEach((c,i)=>{
+      c.rotation.y=t*(i?-.5:.8);
+      c.rotation.x=Math.sin(t*.7+i)*0.06;
+    });
+    /* gentle camera parallax toward the mouse */
+    cam.position.x+=(mx*4-cam.position.x)*.03;
+    cam.position.y+=(-my*3-cam.position.y)*.03;
+    cam.lookAt(0,0,0);
+    renderer.render(scene,cam);
+  }
+  frame();
+})();
+
+/* ===================== SCENE 2: LIQUID-METAL HERO CARD ===================== */
+(function heroCard(){
+  const holder=document.getElementById('hero3d');
+  const canvas=document.getElementById('cardCanvas');
+  const overlay=document.getElementById('cardOverlay');
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(DPR);
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(38,1,.1,50);
+  cam.position.z=6.4;
+  function size(){
+    const r=holder.getBoundingClientRect();
+    renderer.setSize(r.width,r.height,false);
+    cam.aspect=r.width/r.height;cam.updateProjectionMatrix();
+  }
+  size();addEventListener('resize',size);
+
+  /* ---- custom liquid-metal shaders ---- */
+  const vert=`
+    uniform float uTime;
+    varying vec2 vUv;
+    varying float vWave;
+    // cheap value noise
+    float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+    float noise(vec2 p){
+      vec2 i=floor(p),f=fract(p);
+      f=f*f*(3.0-2.0*f);
+      return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),
+                 mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),f.x),f.y);
+    }
+    void main(){
+      vUv=uv;
+      vec3 p=position;
+      float n=noise(uv*3.0+uTime*0.25)+0.5*noise(uv*7.0-uTime*0.35);
+      float wave=sin(uv.x*6.283+uTime*0.9)*0.06+n*0.16;
+      p.z+=wave;
+      vWave=wave;
+      gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
+    }`;
+  const frag=`
+    precision mediump float;
+    uniform float uTime;
+    uniform vec2 uMouse;
+    varying vec2 vUv;
+    varying float vWave;
+    float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+    float noise(vec2 p){
+      vec2 i=floor(p),f=fract(p);
+      f=f*f*(3.0-2.0*f);
+      return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),
+                 mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),f.x),f.y);
+    }
+    float fbm(vec2 p){
+      float v=0.0,a=0.5;
+      for(int i=0;i<4;i++){v+=a*noise(p);p*=2.1;a*=0.5;}
+      return v;
+    }
+    // rounded-rectangle mask so the plane looks like a card
+    float roundRect(vec2 uv, vec2 halfSize, float r){
+      vec2 d=abs(uv-0.5)-halfSize+vec2(r);
+      return length(max(d,0.0))+min(max(d.x,d.y),0.0)-r;
+    }
+    void main(){
+      vec2 uv=vUv;
+      // flowing liquid field, biased slightly toward the cursor
+      vec2 flow=uv*3.0+vec2(uTime*0.12,-uTime*0.09)+uMouse*0.35;
+      float n=fbm(flow);
+      float n2=fbm(flow*1.8+n*1.5);
+      // liquid-metal palette: deep indigo -> periwinkle -> violet -> cyan sheen
+      vec3 cDeep  =vec3(0.055,0.07,0.20);
+      vec3 cIndigo=vec3(0.26,0.32,0.90);
+      vec3 cViolet=vec3(0.55,0.36,0.95);
+      vec3 cCyan  =vec3(0.29,0.85,1.00);
+      vec3 col=mix(cDeep,cIndigo,smoothstep(0.25,0.75,n));
+      col=mix(col,cViolet,smoothstep(0.5,0.95,n2)*0.8);
+      // metallic specular streaks that slide with the flow
+      float streak=pow(abs(sin((uv.x+uv.y)*7.0+n*8.0-uTime*0.7)),24.0);
+      col+=cCyan*streak*0.6;
+      // wave highlight from vertex displacement
+      col+=cCyan*smoothstep(0.12,0.2,vWave)*0.5;
+      // iridescent edge (fresnel-like from uv distance)
+      float edge=smoothstep(0.32,0.5,distance(uv,vec2(0.5)));
+      col+=mix(cViolet,cCyan,uv.y)*edge*0.55;
+      // rounded card mask with soft antialiased border glow
+      float d=roundRect(uv,vec2(0.46,0.44),0.09);
+      float alpha=1.0-smoothstep(0.0,0.012,d);
+      col+=cCyan*smoothstep(0.014,0.0,abs(d))*0.8; // glowing card border
+      gl_FragColor=vec4(col,alpha*0.96);
+    }`;
+  const cardMat=new THREE.ShaderMaterial({
+    vertexShader:vert,fragmentShader:frag,transparent:true,
+    uniforms:{uTime:{value:0},uMouse:{value:new THREE.Vector2(0,0)}},
+    side:THREE.DoubleSide
+  });
+  /* modest segment count keeps mobile at 60fps while waves stay smooth */
+  const seg=IS_MOBILE?[64,40]:[110,70];
+  const card=new THREE.Mesh(new THREE.PlaneGeometry(3.4,2.15,seg[0],seg[1]),cardMat);
+  const cardGroup=new THREE.Group();
+  cardGroup.add(card);
+  scene.add(cardGroup);
+
+  /* floating glow orbs around the card */
+  const orbTex=makeDotTexture('#4BD8FF');
+  const orbs=[];
+  const orbData=[[-2.1,1.1,.6,.09],[2.2,-.9,.4,.12],[1.6,1.4,-.5,.07],[-1.8,-1.3,.3,.1]];
+  orbData.forEach(([x,y,z,s])=>{
+    const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:orbTex,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:.9}));
+    spr.position.set(x,y,z);spr.scale.setScalar(s*6);
+    spr.userData={x,y,z,ph:Math.random()*6.28};
+    scene.add(spr);orbs.push(spr);
+  });
+
+  /* ---- raycasting pointer handler + spring physics tilt ---- */
+  const ray=new THREE.Raycaster(), pointer=new THREE.Vector2();
+  const spring={rx:0,ry:0,vx:0,vy:0,tx:0,ty:0,s:1,vs:0,ts:1};
+  let hovering=false;
+  holder.addEventListener('pointermove',e=>{
+    const r=holder.getBoundingClientRect();
+    pointer.x=((e.clientX-r.left)/r.width)*2-1;
+    pointer.y=-(((e.clientY-r.top)/r.height)*2-1);
+    /* tilt targets: card leans toward the cursor */
+    spring.ty=pointer.x*0.42;
+    spring.tx=-pointer.y*0.3;
+    cardMat.uniforms.uMouse.value.set(pointer.x,pointer.y);
+    /* raycast: grow slightly when the cursor is actually over the card */
+    ray.setFromCamera(pointer,cam);
+    hovering=ray.intersectObject(card).length>0;
+    spring.ts=hovering?1.05:1.0;
+  });
+  holder.addEventListener('pointerleave',()=>{spring.tx=spring.ty=0;spring.ts=1;hovering=false;});
+
+  const activeIO=new IntersectionObserver(es=>{es.forEach(e=>visible.card=e.isIntersecting);},{threshold:.05});
+  activeIO.observe(holder);
+
+  const K=0.075, D=0.86; /* spring stiffness + damping */
+  let t=0;
+  function frame(){
+    if(REDUCED){renderer.render(scene,cam);return;}
+    requestAnimationFrame(frame);
+    if(!visible.card||document.hidden)return;
+    t+=0.016;
+    cardMat.uniforms.uTime.value=t;
+    /* spring integrate */
+    spring.vx+=(spring.tx-spring.rx)*K; spring.vx*=D; spring.rx+=spring.vx;
+    spring.vy+=(spring.ty-spring.ry)*K; spring.vy*=D; spring.ry+=spring.vy;
+    spring.vs+=(spring.ts-spring.s)*K;  spring.vs*=D; spring.s +=spring.vs;
+    cardGroup.rotation.x=spring.rx;
+    cardGroup.rotation.y=spring.ry;
+    cardGroup.scale.setScalar(spring.s);
+    /* idle float */
+    cardGroup.position.y=Math.sin(t*0.8)*0.08;
+    cardGroup.rotation.z=Math.sin(t*0.5)*0.02;
+    /* overlay text mirrors the card's tilt (CSS 3D) */
+    overlay.style.transform=
+      `translate(-50%,-50%) perspective(900px) rotateX(${spring.rx*57.3*0.9}deg) rotateY(${spring.ry*57.3*0.9}deg) translateY(${Math.sin(t*0.8)*6}px) scale(${spring.s})`;
+    orbs.forEach(o=>{
+      const u=o.userData;
+      o.position.y=u.y+Math.sin(t*0.9+u.ph)*0.22;
+      o.position.x=u.x+Math.cos(t*0.6+u.ph)*0.14;
+    });
+    renderer.render(scene,cam);
+  }
+  frame();
+})();
+
+/* ===================== SCENE 3: CODE-CORE TECH GLOBE ===================== */
+(function codeGlobe(){
+  const stage=document.getElementById('orbitScene');
+  const canvas=document.getElementById('globeCanvas');
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(DPR);
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(45,1,.1,60);
+  cam.position.z=8.2;
+  function size(){
+    const r=stage.getBoundingClientRect();
+    const s=Math.min(r.width,r.height)*0.9;
+    renderer.setSize(s,s,false);
+    canvas.style.width=s+'px';canvas.style.height=s+'px';
+    cam.aspect=1;cam.updateProjectionMatrix();
+  }
+  size();addEventListener('resize',()=>{size();setRadius();});
+
+  const R=2.5;
+  const globe=new THREE.Group();
+  scene.add(globe);
+
+  /* 1) surface: glowing points on a fibonacci sphere */
+  const N=BUDGET.globePoints;
+  const sp=new Float32Array(N*3);
+  const golden=Math.PI*(3-Math.sqrt(5));
+  for(let i=0;i<N;i++){
+    const y=1-(i/(N-1))*2, rad=Math.sqrt(1-y*y), th=golden*i;
+    sp[i*3]=Math.cos(th)*rad*R; sp[i*3+1]=y*R; sp[i*3+2]=Math.sin(th)*rad*R;
+  }
+  const surfGeo=new THREE.BufferGeometry();
+  surfGeo.setAttribute('position',new THREE.BufferAttribute(sp,3));
+  globe.add(new THREE.Points(surfGeo,new THREE.PointsMaterial({
+    size:IS_MOBILE?1.6:1.9,map:makeDotTexture('#4BD8FF'),transparent:true,opacity:.85,
+    depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:false
+  })));
+
+  /* faint structural wireframe */
+  const wire=new THREE.LineSegments(
+    new THREE.WireframeGeometry(new THREE.SphereGeometry(R*0.995,20,14)),
+    new THREE.LineBasicMaterial({color:0x39418f,transparent:true,opacity:.16})
+  );
+  globe.add(wire);
+
+  /* 2) THE CORE: a sphere wrapped in scrolling source code -- technology at the center */
+  const coreTex=makeCodeTexture(1024,512,22,true);
+  coreTex.repeat.set(2,1);
+  const core=new THREE.Mesh(
+    new THREE.SphereGeometry(R*0.58,40,28),
+    new THREE.MeshBasicMaterial({map:coreTex,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false})
+  );
+  globe.add(core);
+  /* inner heartbeat glow */
+  const heart=new THREE.Sprite(new THREE.SpriteMaterial({map:makeDotTexture('#6C7BFF'),transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:.8}));
+  heart.scale.setScalar(R*1.7);
+  globe.add(heart);
+  /* rising binary sparks inside the shell */
+  const M=BUDGET.corePoints;
+  const ip=new Float32Array(M*3), iv=new Float32Array(M);
+  for(let i=0;i<M;i++){
+    const r=R*(0.62+Math.random()*0.3), a=Math.random()*6.283, b=Math.acos(2*Math.random()-1);
+    ip[i*3]=r*Math.sin(b)*Math.cos(a); ip[i*3+1]=r*Math.cos(b); ip[i*3+2]=r*Math.sin(b)*Math.sin(a);
+    iv[i]=0.15+Math.random()*0.5;
+  }
+  const inGeo=new THREE.BufferGeometry();
+  inGeo.setAttribute('position',new THREE.BufferAttribute(ip,3));
+  const sparks=new THREE.Points(inGeo,new THREE.PointsMaterial({
+    size:1.3,map:makeDotTexture('#A06BFF'),transparent:true,opacity:.7,
+    depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:false
+  }));
+  globe.add(sparks);
+
+  /* 3) holographic code rings orbiting the sphere */
+  const ringTexA=makeCodeTexture(2048,96,30,false);
+  ringTexA.repeat.set(3,1);
+  const ringTexB=makeCodeTexture(2048,72,24,false);
+  ringTexB.repeat.set(4,1);
+  function codeBand(radius,height,tex,tiltX,tiltZ){
+    const m=new THREE.Mesh(
+      new THREE.CylinderGeometry(radius,radius,height,72,1,true),
+      new THREE.MeshBasicMaterial({map:tex,transparent:true,opacity:.8,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false})
+    );
+    m.rotation.x=tiltX;m.rotation.z=tiltZ;
+    return m;
+  }
+  const bandA=codeBand(R*1.28,0.34,ringTexA, 0.28, 0.10);
+  const bandB=codeBand(R*1.5 ,0.24,ringTexB,-0.42,-0.16);
+  scene.add(bandA,bandB);
+
+  /* activity: render only while the section is on screen */
+  const activeIO=new IntersectionObserver(es=>{es.forEach(e=>visible.globe=e.isIntersecting);},{threshold:.02});
+  activeIO.observe(stage);
+
+  let t=0;
+  function frame(){
+    if(REDUCED){renderer.render(scene,cam);return;}
+    requestAnimationFrame(frame);
+    if(!visible.globe||document.hidden)return;
+    t+=0.016;
+    const spin=0.0035+globeSpeedBoost;
+    globeSpeedBoost*=0.94;
+    globe.rotation.y+=spin;
+    core.rotation.y-=spin*2.2;               /* code core counter-rotates */
+    coreTex.offset.y=(coreTex.offset.y+0.0007)%1; /* code scrolls upward forever */
+    bandA.rotation.y+=spin*1.6;
+    bandB.rotation.y-=spin*1.2;
+    ringTexA.offset.x=(ringTexA.offset.x+0.0005)%1;
+    ringTexB.offset.x=(ringTexB.offset.x-0.0004)%1;
+    heart.material.opacity=0.55+Math.sin(t*1.4)*0.25; /* heartbeat */
+    /* sparks drift upward and respawn at the bottom */
+    const arr=inGeo.attributes.position.array;
+    for(let i=0;i<M;i++){
+      arr[i*3+1]+=iv[i]*0.006;
+      if(arr[i*3+1]>R*0.92)arr[i*3+1]=-R*0.92;
+    }
+    inGeo.attributes.position.needsUpdate=true;
+    renderer.render(scene,cam);
+  }
+  frame();
+})();
+
+/* restore saved language last, after all dynamic DOM is ready */
+try{ if(localStorage.getItem('ij-lang')==='sq') setLang('sq'); }catch(e){}
+</script>
+</body>
+</html>
