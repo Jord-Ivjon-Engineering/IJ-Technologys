@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Reviews · Moderation — IJ Technologys</title>
+<link rel="stylesheet" href="/css/styles.css">
+<style>
+  body{min-height:100vh;padding:40px 0}
+  .admin{max-width:760px;margin:0 auto;padding:0 20px}
+  .admin h1{font-size:1.8rem;margin-bottom:6px}
+  .admin .sub{color:var(--muted);margin-bottom:26px}
+  .tokbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:24px}
+  .tokbar input{flex:1;min-width:200px;padding:12px 14px;border-radius:var(--r);border:1px solid var(--stroke);background:var(--surface-strong);color:var(--text);font-family:var(--body)}
+  .rev{border:1px solid var(--stroke);border-radius:var(--r);padding:18px 20px;margin-bottom:14px;background:var(--card-bg)}
+  .rev .stars{color:var(--amber);letter-spacing:2px}
+  .rev .stars .off{color:var(--muted);opacity:.4}
+  .rev p{margin:10px 0 12px;color:var(--text)}
+  .rev .meta{font-size:.82rem;color:var(--muted);margin-bottom:14px}
+  .rev .meta b{color:var(--text);font-weight:600}
+  .rev .acts{display:flex;gap:10px}
+  .btn.sm{padding:9px 16px;font-size:.85rem}
+  .btn.danger{border-color:#c0392b;color:#c0392b;background:transparent}
+  .msg{padding:12px 0;color:var(--muted)}
+  .msg.err{color:#c0392b}
+</style>
+</head>
+<body>
+<div class="admin">
+  <h1>Review moderation</h1>
+  <p class="sub">Approve reviews to publish them into the “What clients say” loop, or reject to remove.</p>
+  <div class="tokbar">
+    <input id="token" type="password" placeholder="Admin token" autocomplete="current-password">
+    <button class="btn primary sm" id="load">Load pending</button>
+  </div>
+  <div id="msg" class="msg">Enter your admin token and load pending reviews.</div>
+  <div id="list"></div>
+</div>
+<script>
+(function(){
+  const tokenEl = document.getElementById('token');
+  const listEl = document.getElementById('list');
+  const msgEl = document.getElementById('msg');
+  try { tokenEl.value = localStorage.getItem('ij-admin-token') || ''; } catch(e){}
+
+  function esc(s){ const d=document.createElement('div'); d.textContent=s==null?'':String(s); return d.innerHTML; }
+  function token(){ return tokenEl.value.trim(); }
+  function say(t, err){ msgEl.textContent=t; msgEl.className='msg'+(err?' err':''); }
+  function stars(n){ n=Math.max(1,Math.min(5,+n||5)); return '★'.repeat(n)+'<span class="off">'+'☆'.repeat(5-n)+'</span>'; }
+
+  async function api(path, opts){
+    opts = opts || {};
+    opts.headers = Object.assign({ 'Authorization':'Bearer '+token() }, opts.headers||{});
+    const res = await fetch('/api/reviews'+path, opts);
+    const body = await res.json().catch(function(){ return {}; });
+    return { res: res, body: body };
+  }
+
+  async function load(){
+    if(!token()){ say('Please enter your admin token.', true); return; }
+    try { localStorage.setItem('ij-admin-token', token()); } catch(e){}
+    say('Loading…');
+    const { res, body } = await api('/pending');
+    if(res.status === 401){ say('Unauthorized — wrong admin token.', true); return; }
+    if(!body.ok){ say('Could not load reviews.', true); return; }
+    render(body.reviews || []);
+  }
+
+  function render(reviews){
+    listEl.innerHTML = '';
+    if(!reviews.length){ say('No reviews are waiting for approval.'); return; }
+    say(reviews.length + ' review(s) awaiting approval.');
+    reviews.forEach(function(r){
+      const card = document.createElement('div');
+      card.className = 'rev';
+      card.innerHTML =
+        '<div class="stars" aria-hidden="true">'+stars(r.rating)+'</div>'+
+        '<p>'+esc(r.text)+'</p>'+
+        '<div class="meta"><b>'+esc(r.name)+'</b>'+(r.role? ' · '+esc(r.role):'')+'</div>'+
+        '<div class="acts">'+
+          '<button class="btn primary sm" data-act="approve">Approve</button>'+
+          '<button class="btn sm danger" data-act="reject">Reject</button>'+
+        '</div>';
+      card.querySelector('[data-act="approve"]').addEventListener('click', function(){ act(r.id, 'approve', card); });
+      card.querySelector('[data-act="reject"]').addEventListener('click', function(){ act(r.id, 'reject', card); });
+      listEl.appendChild(card);
+    });
+  }
+
+  async function act(id, kind, card){
+    const opts = kind === 'approve' ? { method:'POST' } : { method:'DELETE' };
+    const path = kind === 'approve' ? '/'+id+'/approve' : '/'+id;
+    const { res, body } = await api(path, opts);
+    if(res.ok && body.ok){
+      card.remove();
+      say((kind === 'approve' ? 'Approved.' : 'Rejected.') + ' ' + (listEl.children.length ? listEl.children.length+' left.' : 'None left.'));
+    } else if(res.status === 401){
+      say('Unauthorized — wrong admin token.', true);
+    } else {
+      say('Action failed.', true);
+    }
+  }
+
+  document.getElementById('load').addEventListener('click', load);
+  tokenEl.addEventListener('keydown', function(e){ if(e.key === 'Enter') load(); });
+})();
+</script>
+</body>
+</html>
