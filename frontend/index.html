@@ -7,12 +7,17 @@
 <title>IJ Technologys — Websites, shops &amp; digital products</title>
 <script>
 (function(){
+  var mobile=window.matchMedia('(max-width: 1020px)').matches;
+  document.documentElement.setAttribute('data-display',mobile?'mobile':'desktop');
   try{
     var t=localStorage.getItem('ij-theme');
-    if(!t) t='dark';
+    if(!t) t=mobile?'light':'dark';
     document.documentElement.setAttribute('data-theme',t);
-  }catch(e){document.documentElement.setAttribute('data-theme','dark');}
+  }catch(e){document.documentElement.setAttribute('data-theme',mobile?'light':'dark');}
   document.documentElement.classList.add('js');
+  if(!mobile){
+    document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+  }
 })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +25,6 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" href="/images/logo.png" type="image/png">
 <link rel="stylesheet" href="/css/styles.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#contact" data-en="Skip to contact" data-sq="Kalo te kontakti">Skip to contact</a>
@@ -58,6 +62,16 @@
   <a href="#clients" data-en="Clients" data-sq="Klientët">Clients</a>
   <a href="#offers" data-en="Pricing" data-sq="Çmimet">Pricing</a>
   <a href="#contact" data-en="Contact" data-sq="Kontakt">Contact</a>
+  <div class="mobile-menu-tools">
+    <button type="button" class="theme-toggle" id="themeToggleMenu" aria-label="Toggle light and dark mode">
+      <span class="icon-sun" aria-hidden="true">☀</span>
+      <span class="icon-moon" aria-hidden="true">☽</span>
+    </button>
+    <div class="mobile-menu-lang toggle-group lang">
+      <button type="button" id="btn-sq-menu">ALB</button>
+      <button type="button" id="btn-en-menu" class="active">ENG</button>
+    </div>
+  </div>
 </div>
 
 <main id="top">
@@ -88,7 +102,8 @@
         <p class="card-title" data-en="Built to work on every screen." data-sq="Ndërtuar për çdo ekran.">Built to work on every screen.</p>
         <p class="card-meta" data-en="Design, code and launch in one place." data-sq="Dizajn, kod dhe nisje në një vend.">Design, code and launch in one place.</p>
       </div>
-      <span class="hint" data-en="Move your mouse to explore" data-sq="Lëviz mausin për të eksploruar">Move your mouse to explore</span>
+      <span class="hint hint-desktop" data-en="Move your mouse to explore" data-sq="Lëviz mausin për të eksploruar">Move your mouse to explore</span>
+      <span class="hint hint-mobile" data-en="Built for phones and desktops alike." data-sq="Ndërtuar për telefon dhe desktop njësoj.">Built for phones and desktops alike.</span>
     </div>
   </div>
 </section>
@@ -104,7 +119,8 @@
   <div class="projects-stage">
     <div class="sec-head center">
       <h2 data-en="Recent work from the region" data-sq="Punë e fundit nga rajoni">Recent work from the <span class="accent">region</span></h2>
-      <p class="sub" data-en="Scroll to rotate the globe and browse projects we built for shops, stays and local services." data-sq="Lëviz poshtë për të rrotulluar globin dhe shfletuar projektet që kemi ndërtuar për dyqane, bujtina dhe shërbime lokale.">Scroll to rotate the globe and browse projects we built for shops, stays and local services.</p>
+      <p class="sub sub-desktop" data-en="Scroll to rotate the globe and browse projects we built for shops, stays and local services." data-sq="Lëviz poshtë për të rrotulluar globin dhe shfletuar projektet që kemi ndërtuar për dyqane, bujtina dhe shërbime lokale.">Scroll to rotate the globe and browse projects we built for shops, stays and local services.</p>
+      <p class="sub sub-mobile" data-en="Projects we built for shops, guesthouses and local services in the region." data-sq="Projekte që kemi ndërtuar për dyqane, bujtina dhe shërbime lokale në rajon.">Projects we built for shops, guesthouses and local services in the region.</p>
     </div>
     <span class="scroll-hint" id="scrollHint">
       <span class="wheel"></span>
@@ -378,7 +394,7 @@
         <h2 data-en="Tell us about your project" data-sq="Na trego për projektin tënd">Tell us about your project</h2>
         <p class="sub" data-en="We reply within one business day. Your message goes straight to our inbox." data-sq="Të kthehemi brenda një dite pune. Mesazhi yt shkon drejt te ne.">We reply within one business day. Your message goes straight to our inbox.</p>
       </div>
-      <div class="contact-steps reveal" aria-hidden="true">
+      <div class="contact-steps reveal">
         <span data-en="1. Send details" data-sq="1. Dërgo detajet">1. Send details</span>
         <span data-en="2. We reply with next steps" data-sq="2. Përgjigjemi me hapat">2. We reply with next steps</span>
         <span data-en="3. Start when you're ready" data-sq="3. Nis kur të jesh gati">3. Start when you're ready</span>
@@ -441,7 +457,8 @@
       </div>
       <div class="foot-col">
         <h3 data-en="Phone" data-sq="Telefon">Phone</h3>
-        <a href="mailto:hello@ijtechnologys.com?subject=Call%20request"><span class="ic" aria-hidden="true">✆</span><span data-en="Request a call" data-sq="Kërko një telefonatë">Request a call</span></a>
+        <a class="foot-call-desktop" href="mailto:hello@ijtechnologys.com?subject=Call%20request"><span class="ic" aria-hidden="true">✆</span><span data-en="Request a call" data-sq="Kërko një telefonatë">Request a call</span></a>
+        <a class="foot-call-mobile" href="#contact" data-call-request="1"><span class="ic" aria-hidden="true">✆</span><span data-en="Request a call" data-sq="Kërko një telefonatë">Request a call</span></a>
       </div>
     </div>
     <div class="foot-note">

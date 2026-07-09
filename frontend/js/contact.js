@@ -71,15 +71,24 @@
     }
   }
 
+  const DRAFT_MSG = {
+    restored: { en:'Draft restored.', sq:'Drafti u rikthye.' },
+  };
+
   function loadDraft(){
     try{
       const raw = localStorage.getItem(DRAFT_KEY);
       if(!raw) return;
       const d = JSON.parse(raw);
+      const hadContent = !!(d.name || d.email || d.message);
       if(d.name) form.name.value = d.name;
       if(d.email) form.email.value = d.email;
       if(d.message) form.message.value = d.message;
       if(d.package && pkgSelect) pkgSelect.value = d.package;
+      if(hadContent && document.documentElement.getAttribute('data-display') === 'mobile'){
+        status.textContent = DRAFT_MSG.restored[lang()];
+        status.className = 'form-status';
+      }
     }catch(e){}
   }
 

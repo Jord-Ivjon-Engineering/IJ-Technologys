@@ -1,10 +1,24 @@
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const IS_MOBILE = matchMedia('(max-width: 768px)').matches || navigator.maxTouchPoints > 1;
-const DPR = Math.min(window.devicePixelRatio || 1, IS_MOBILE ? 1.5 : 1.75);
+const DISPLAY_MQ = matchMedia('(max-width: 1020px)');
+
+function isMobileDisplay(){
+  return document.documentElement.getAttribute('data-display') === 'mobile';
+}
+
+function isDesktopDisplay(){
+  return document.documentElement.getAttribute('data-display') === 'desktop';
+}
+
+DISPLAY_MQ.addEventListener('change', ()=>{
+  const next = DISPLAY_MQ.matches ? 'mobile' : 'desktop';
+  if(document.documentElement.getAttribute('data-display') !== next) location.reload();
+});
+
+const DPR = Math.min(window.devicePixelRatio || 1, isDesktopDisplay() ? 1.75 : 1.5);
 const BUDGET = {
-  bgParticles : IS_MOBILE ? 400  : 900,
-  globePoints : IS_MOBILE ? 650  : 1300,
-  corePoints  : IS_MOBILE ? 80   : 160,
+  bgParticles : 900,
+  globePoints : 1300,
+  corePoints  : 160,
 };
 const visible = { bg:true, card:false, globe:false };
 document.addEventListener('visibilitychange',()=>{ visible.bg = !document.hidden; });
@@ -19,21 +33,32 @@ function setTheme(theme){
 }
 
 function initTheme(){
-  const btn = document.getElementById('themeToggle');
-  if(!btn) return;
-  btn.addEventListener('click', ()=>{
+  function toggle(){
     setTheme(getTheme() === 'light' ? 'dark' : 'light');
-  });
+  }
+  document.getElementById('themeToggle')?.addEventListener('click', toggle);
+  document.getElementById('themeToggleMenu')?.addEventListener('click', toggle);
 }
 
 function setLang(lang){
   document.documentElement.lang = lang;
   document.querySelectorAll('[data-en]').forEach(el=>{
     const t = el.getAttribute('data-'+lang);
-    if(t) el.innerHTML = t;
+    if(!t) return;
+    const tag = el.tagName;
+    if(tag === 'INPUT' || tag === 'TEXTAREA'){
+      if(el.hasAttribute('placeholder')) el.placeholder = t;
+    }else if(tag === 'OPTION'){
+      el.textContent = t;
+    }else{
+      el.innerHTML = t;
+    }
   });
-  document.getElementById('btn-en').classList.toggle('active', lang==='en');
-  document.getElementById('btn-sq').classList.toggle('active', lang==='sq');
+  ['btn-en','btn-sq','btn-en-menu','btn-sq-menu'].forEach(id=>{
+    const btn = document.getElementById(id);
+    if(!btn) return;
+    btn.classList.toggle('active', id.includes('en') ? lang === 'en' : lang === 'sq');
+  });
   try{ localStorage.setItem('ij-lang', lang); }catch(e){}
   buildMarquees();
   if(typeof window.contactFormRefresh === 'function') window.contactFormRefresh();
@@ -58,6 +83,14 @@ mmenu.querySelectorAll('a').forEach(a=> a.addEventListener('click', ()=>{
   burger.setAttribute('aria-expanded', 'false');
   mmenu.setAttribute('aria-hidden', 'true');
 }));
+function closeMobileMenu(){
+  mmenu.classList.remove('open');
+  burger.classList.remove('open');
+  burger.setAttribute('aria-expanded', 'false');
+  mmenu.setAttribute('aria-hidden', 'true');
+}
+document.getElementById('btn-en-menu')?.addEventListener('click', ()=>{ setLang('en'); closeMobileMenu(); });
+document.getElementById('btn-sq-menu')?.addEventListener('click', ()=>{ setLang('sq'); closeMobileMenu(); });
 
 const counterIO = new IntersectionObserver(es=>{
   es.forEach(en=>{
@@ -166,21 +199,32 @@ function animateRing(){
   requestAnimationFrame(animateRing);
 }
 
-window.addEventListener('scroll', ()=>{
-  if(!ticking){ requestAnimationFrame(updateRing); ticking = true; }
-},{ passive:true });
-updateRing();
-animateRing();
+if(isDesktopDisplay()){
+  window.addEventListener('scroll', ()=>{
+    if(!ticking){ requestAnimationFrame(updateRing); ticking = true; }
+  },{ passive:true });
+  updateRing();
+  animateRing();
 
-function setRadius(){
-  const w = window.innerWidth;
-  const r = w <= 560 ? 240 : w <= 1020 ? 320 : 420;
-  document.querySelectorAll('.pcard').forEach(c=> c.style.setProperty('--radius', r + 'px'));
-  updateCardTransforms(currentRot);
+  function setRadius(){
+    const w = window.innerWidth;
+    const r = w <= 560 ? 240 : w <= 1020 ? 320 : 420;
+    document.querySelectorAll('.pcard').forEach(c=> c.style.setProperty('--radius', r + 'px'));
+    updateCardTransforms(currentRot);
+  }
+  setRadius();
+  updateCardTransforms(0);
+  window.addEventListener('resize', setRadius);
 }
-setRadius();
-updateCardTransforms(0);
-window.addEventListener('resize', setRadius);
+
+document.querySelector('.foot-call-mobile')?.addEventListener('click', ()=>{
+  const msg = document.getElementById('cf-message');
+  if(msg && !msg.value.trim()){
+    msg.value = document.documentElement.lang === 'sq'
+      ? 'Do të doja një telefonatë për të diskutuar projektin.'
+      : 'I would like a call to discuss my project.';
+  }
+});
 
 document.querySelectorAll('[data-plan]').forEach(link=>{
   link.addEventListener('click', ()=>{
@@ -223,7 +267,7 @@ function makeCodeTexture(w,h,fontSize,dense, cols, dimColor){
 }
 
 (function bgField(){
-  if(REDUCED) return;
+  if(REDUCED || isMobileDisplay() || typeof THREE === 'undefined') return;
   const canvas = document.getElementById('bgCanvas');
   const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:false, powerPreference:'low-power'});
   renderer.setPixelRatio(DPR);
@@ -241,8 +285,8 @@ function makeCodeTexture(w,h,fontSize,dense, cols, dimColor){
     pos[i*3+2] = (Math.random() - .5) * 60;
   }
   const groups = [
-    {color:'#00ced1', size: IS_MOBILE ? 1.4 : 1.7, count: .6},
-    {color:'#00e8ff', size: IS_MOBILE ? 1.1 : 1.3, count: .4},
+    {color:'#00ced1', size: 1.7, count: .6},
+    {color:'#00e8ff', size: 1.3, count: .4},
   ];
   const clouds = groups.map((gr, gi)=>{
     const start = gi === 0 ? 0 : Math.floor(N * groups[0].count);
@@ -277,7 +321,7 @@ function makeCodeTexture(w,h,fontSize,dense, cols, dimColor){
 })();
 
 (function heroCard(){
-  if(REDUCED) return;
+  if(REDUCED || isMobileDisplay() || typeof THREE === 'undefined') return;
   const holder = document.getElementById('hero3d');
   const canvas = document.getElementById('cardCanvas');
   const overlay = document.getElementById('cardOverlay');
@@ -361,7 +405,7 @@ function makeCodeTexture(w,h,fontSize,dense, cols, dimColor){
     uniforms: { uTime: {value:0}, uMouse: {value: new THREE.Vector2(0,0)} },
     side: THREE.DoubleSide
   });
-  const seg = IS_MOBILE ? [64,40] : [110,70];
+  const seg = [110,70];
   const card = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 2.15, seg[0], seg[1]), cardMat);
   const cardGroup = new THREE.Group();
   cardGroup.add(card);
@@ -423,6 +467,7 @@ function makeCodeTexture(w,h,fontSize,dense, cols, dimColor){
 })();
 
 (function codeGlobe(){
+  if(isMobileDisplay() || typeof THREE === 'undefined') return;
   const stage = document.getElementById('orbitScene');
   const canvas = document.getElementById('globeCanvas');
   const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
@@ -478,7 +523,7 @@ function makeCodeTexture(w,h,fontSize,dense, cols, dimColor){
   const surfGeo = new THREE.BufferGeometry();
   surfGeo.setAttribute('position', new THREE.BufferAttribute(sp, 3));
   const surfMat = new THREE.PointsMaterial({
-    size: IS_MOBILE ? 1.55 : 1.85, map: makeDotTexture('#00e8ff'), transparent: true, opacity: .95,
+    size: 1.85, map: makeDotTexture('#00e8ff'), transparent: true, opacity: .95,
     depthWrite: true, blending: THREE.NormalBlending, sizeAttenuation: false
   });
   globe.add(new THREE.Points(surfGeo, surfMat));
@@ -595,4 +640,7 @@ function makeCodeTexture(w,h,fontSize,dense, cols, dimColor){
 })();
 
 initTheme();
-try{ if(localStorage.getItem('ij-lang') === 'sq') setLang('sq'); }catch(e){}
+try{
+  if(localStorage.getItem('ij-lang') === 'sq') setLang('sq');
+  else if(!localStorage.getItem('ij-lang') && isMobileDisplay() && navigator.language && navigator.language.toLowerCase().startsWith('sq')) setLang('sq');
+}catch(e){}
