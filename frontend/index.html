@@ -3,21 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IJ Technologys — We Build Websites &amp; Everything Digital</title>
+<meta name="color-scheme" content="light dark">
+<title>IJ Technologys — Websites, shops &amp; digital products</title>
+<script>
+(function(){
+  try{
+    var t=localStorage.getItem('ij-theme');
+    if(!t) t='dark';
+    document.documentElement.setAttribute('data-theme',t);
+  }catch(e){document.documentElement.setAttribute('data-theme','dark');}
+  document.documentElement.classList.add('js');
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/images/logo.png" type="image/png">
 <link rel="stylesheet" href="/css/styles.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
+<a class="skip-link" href="#contact" data-en="Skip to contact" data-sq="Kalo te kontakti">Skip to contact</a>
 <canvas id="bgCanvas" aria-hidden="true"></canvas>
 <div class="vignette" aria-hidden="true"></div>
 
-<!-- ================= HEADER ================= -->
 <header id="header">
-  <nav class="nav">
-    <a class="logo" href="#top"><span class="mark">IJ</span><span>Technologys</span></a>
+  <nav class="nav" aria-label="Main">
+    <a class="logo" href="#top"><img src="/images/logo.png" alt="IJ Technologys"><span>Technologys</span></a>
     <ul class="nav-links">
       <li><a href="#about" data-en="About" data-sq="Rreth nesh">About</a></li>
       <li><a href="#projects" data-en="Projects" data-sq="Projektet">Projects</a></li>
@@ -27,15 +39,19 @@
       <li><a href="#contact" data-en="Contact" data-sq="Kontakt">Contact</a></li>
     </ul>
     <div class="nav-right">
-      <div class="lang">
-        <button id="btn-sq" onclick="setLang('sq')">ALB</button>
-        <button id="btn-en" class="active" onclick="setLang('en')">ENG</button>
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode">
+        <span class="icon-sun" aria-hidden="true">☀</span>
+        <span class="icon-moon" aria-hidden="true">☽</span>
+      </button>
+      <div class="toggle-group lang">
+        <button type="button" id="btn-sq">ALB</button>
+        <button type="button" id="btn-en" class="active">ENG</button>
       </div>
-      <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </nav>
 </header>
-<div class="mobile-menu" id="mobileMenu">
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
   <a href="#about" data-en="About" data-sq="Rreth nesh">About</a>
   <a href="#projects" data-en="Projects" data-sq="Projektet">Projects</a>
   <a href="#work" data-en="How we work" data-sq="Si punojmë">How we work</a>
@@ -46,378 +62,356 @@
 
 <main id="top">
 
-<!-- ================= HERO ================= -->
 <section class="hero" id="about">
   <div class="container hero-grid">
     <div class="reveal in">
-      <span class="eyebrow" data-en="Web studio · design + code + everything digital" data-sq="Studio web · dizajn + kod + gjithçka dixhitale">Web studio · design + code + everything digital</span>
-      <h1>
-        <span data-en="Make your dreams come true with" data-sq="Bëji ëndrrat e tua realitet me">Make your dreams come true with</span>
-        <span class="grad-text">IJ Technologys.</span>
-      </h1>
-      <p class="lead" data-en="We design and build websites, online shops and custom digital products that don't just sit there — they move, react and sell. From the first idea to launch day, one team handles everything."
-         data-sq="Ne projektojmë dhe ndërtojmë faqe interneti, dyqane online dhe produkte dixhitale të personalizuara që nuk rrinë thjesht aty — ato lëvizin, reagojnë dhe shesin. Nga ideja e parë deri në ditën e nisjes, një ekip i vetëm kujdeset për gjithçka.">
-        We design and build websites, online shops and custom digital products that don't just sit there — they move, react and sell. From the first idea to launch day, one team handles everything.
+      <p class="section-label" data-en="Web studio for local businesses" data-sq="Studio web për biznese lokale">Web studio for local businesses</p>
+      <h1 data-en="Websites and shops you can trust to launch on time." data-sq="Faqe dhe dyqane që mund t'i besosh për nisje në kohë.">Websites and shops you can trust to launch on time.</h1>
+      <p class="lead" data-en="We design and build websites, online shops and custom tools for shops, guesthouses and restaurants in the region. One team from first sketch to launch, with clear pricing and weekly progress."
+         data-sq="Ne projektojmë dhe ndërtojmë faqe interneti, dyqane online dhe mjete të personalizuara për dyqane, bujtina dhe restorante në rajon. Një ekip nga skica e parë deri te nisja, me çmime të qarta dhe progres çdo javë.">
+        We design and build websites, online shops and custom tools for shops, guesthouses and restaurants in the region. One team from first sketch to launch, with clear pricing and weekly progress.
       </p>
       <div class="cta-row">
-        <a class="btn primary" href="#offers" data-en="See what we offer →" data-sq="Shiko çfarë ofrojmë →">See what we offer →</a>
-        <a class="btn" href="#projects" data-en="Spin our projects" data-sq="Rrotullo projektet">Spin our projects</a>
+        <a class="btn primary" href="#contact" data-plan="Pro" data-en="Start with Pro →" data-sq="Nis me Pro →">Start with Pro →</a>
+        <a class="btn" href="#offers" data-en="See pricing" data-sq="Shiko çmimet">See pricing</a>
       </div>
       <div class="stats">
-        <div class="stat"><b class="grad-text" data-count="48">0</b><span data-en="projects launched" data-sq="projekte të nisura">projects launched</span></div>
-        <div class="stat"><b class="grad-text" data-count="31">0</b><span data-en="happy clients" data-sq="klientë të kënaqur">happy clients</span></div>
-        <div class="stat"><b class="grad-text" data-count="6">0</b><span data-en="countries reached" data-sq="vende të arritura">countries reached</span></div>
+        <div class="stat"><b data-count="48">48+</b><span data-en="projects launched" data-sq="projekte të nisura">projects launched</span></div>
+        <div class="stat"><b data-count="31">31+</b><span data-en="happy clients" data-sq="klientë të kënaqur">happy clients</span></div>
+        <div class="stat"><b data-count="6">6+</b><span data-en="countries reached" data-sq="vende të arritura">countries reached</span></div>
       </div>
     </div>
     <div class="hero3d reveal in d1" id="hero3d">
       <canvas id="cardCanvas"></canvas>
       <div class="card-overlay" id="cardOverlay" aria-hidden="true">
-        <div class="co-mark">IJ</div>
-        <h3 data-en="Websites that move." data-sq="Faqe që lëvizin.">Websites that move.</h3>
-        <p>&lt;built by="IJ Technologys" /&gt;</p>
+        <div class="co-mark"><img src="/images/logo.png" alt=""></div>
+        <p class="card-title" data-en="Built to work on every screen." data-sq="Ndërtuar për çdo ekran.">Built to work on every screen.</p>
+        <p class="card-meta" data-en="Design, code and launch in one place." data-sq="Dizajn, kod dhe nisje në një vend.">Design, code and launch in one place.</p>
       </div>
-      <span class="hint" data-en="move your mouse" data-sq="lëviz mausin">move your mouse</span>
+      <span class="hint" data-en="Move your mouse to explore" data-sq="Lëviz mausin për të eksploruar">Move your mouse to explore</span>
     </div>
   </div>
 </section>
 
-<!-- services strip -->
 <div class="strip" aria-hidden="true">
   <div class="strip-track" id="strip">
-    <span data-en="Websites <i>◆</i> Online shops <i>◆</i> Web apps <i>◆</i> Booking systems <i>◆</i> Branding <i>◆</i> Hosting &amp; care <i>◆</i> SEO <i>◆</i> 3D &amp; animations <i>◆</i>"
-          data-sq="Faqe interneti <i>◆</i> Dyqane online <i>◆</i> Aplikacione web <i>◆</i> Sisteme rezervimi <i>◆</i> Branding <i>◆</i> Hostim &amp; mirëmbajtje <i>◆</i> SEO <i>◆</i> 3D &amp; animacione <i>◆</i>">Websites <i>◆</i> Online shops <i>◆</i> Web apps <i>◆</i> Booking systems <i>◆</i> Branding <i>◆</i> Hosting &amp; care <i>◆</i> SEO <i>◆</i> 3D &amp; animations <i>◆</i></span>
+    <span data-en="Websites <i>◆</i> Online shops <i>◆</i> Web apps <i>◆</i> Booking systems <i>◆</i> Branding <i>◆</i> Hosting &amp; care <i>◆</i> SEO <i>◆</i> Animations <i>◆</i>"
+          data-sq="Faqe interneti <i>◆</i> Dyqane online <i>◆</i> Aplikacione web <i>◆</i> Sisteme rezervimi <i>◆</i> Branding <i>◆</i> Hostim &amp; mirëmbajtje <i>◆</i> SEO <i>◆</i> Animacione <i>◆</i>">Websites <i>◆</i> Online shops <i>◆</i> Web apps <i>◆</i> Booking systems <i>◆</i> Branding <i>◆</i> Hosting &amp; care <i>◆</i> SEO <i>◆</i> Animations <i>◆</i></span>
   </div>
 </div>
 
-<!-- ================= GLOBE + PROJECTS ================= -->
 <section class="projects-wrap" id="projects">
   <div class="projects-stage">
     <div class="sec-head center">
-      <span class="eyebrow" data-en="Built by us · seen everywhere" data-sq="Ndërtuar nga ne · parë kudo">Built by us · seen everywhere</span>
-      <h2 data-en="Our projects orbit the globe" data-sq="Projektet tona rrotullohen rreth globit">Our projects orbit the <span class="grad-text">globe</span></h2>
+      <h2 data-en="Recent work from the region" data-sq="Punë e fundit nga rajoni">Recent work from the <span class="accent">region</span></h2>
+      <p class="sub" data-en="Scroll to rotate the globe and browse projects we built for shops, stays and local services." data-sq="Lëviz poshtë për të rrotulluar globin dhe shfletuar projektet që kemi ndërtuar për dyqane, bujtina dhe shërbime lokale.">Scroll to rotate the globe and browse projects we built for shops, stays and local services.</p>
     </div>
     <span class="scroll-hint" id="scrollHint">
       <span class="wheel"></span>
-      <span data-en="scroll to spin them" data-sq="lëviz poshtë për t'i rrotulluar">scroll to spin them</span>
+      <span data-en="Scroll to explore" data-sq="Lëviz për të eksploruar">Scroll to explore</span>
     </span>
     <div class="orbit-scene" id="orbitScene">
       <canvas id="globeCanvas" aria-hidden="true"></canvas>
       <div class="ring" id="ring">
         <article class="pcard" style="--i:0">
-          <div class="thumb"><img loading="lazy" src="https://picsum.photos/seed/ijp1/580/360" alt="Buna Market"></div>
+          <div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&amp;fit=crop&amp;w=580&amp;h=360&amp;q=80" alt="Fresh produce at Buna Market online shop"></div>
           <div class="body"><span class="tag" data-en="online shop" data-sq="dyqan online">online shop</span><h3>Buna Market</h3>
-          <p data-en="Full e-commerce with cart, card payments and live delivery tracking." data-sq="E-commerce i plotë me shportë, pagesa me kartë dhe gjurmim dërgesash.">Full e-commerce with cart, card payments and live delivery tracking.</p></div>
+          <p data-en="E-commerce with cart, card payments and delivery tracking for a local grocer." data-sq="E-commerce me shportë, pagesa me kartë dhe gjurmim dërgesash për një dyqan lokal.">E-commerce with cart, card payments and delivery tracking for a local grocer.</p></div>
         </article>
         <article class="pcard" style="--i:1">
-          <div class="thumb"><img loading="lazy" src="https://picsum.photos/seed/ijp2/580/360" alt="Alpet Stay"></div>
+          <div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&amp;fit=crop&amp;w=580&amp;h=360&amp;q=80" alt="Alpet Stay guesthouse booking website"></div>
           <div class="body"><span class="tag" data-en="booking system" data-sq="sistem rezervimesh">booking system</span><h3>Alpet Stay</h3>
-          <p data-en="Guesthouse booking platform with live calendar and instant confirmation." data-sq="Platformë rezervimesh me kalendar dhe konfirmim të çastit.">Guesthouse booking platform with live calendar and instant confirmation.</p></div>
+          <p data-en="Guesthouse booking with live calendar and instant confirmation, mobile-first." data-sq="Rezervime bujtine me kalendar live dhe konfirmim të çastit, së pari për celular.">Guesthouse booking with live calendar and instant confirmation, mobile-first.</p></div>
         </article>
         <article class="pcard" style="--i:2">
-          <div class="thumb"><img loading="lazy" src="https://picsum.photos/seed/ijp3/580/360" alt="Tavolina 12"></div>
+          <div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&amp;fit=crop&amp;w=580&amp;h=360&amp;q=80" alt="Tavolina 12 restaurant website"></div>
           <div class="body"><span class="tag" data-en="restaurant" data-sq="restorant">restaurant</span><h3>Tavolina 12</h3>
-          <p data-en="Animated menu, table reservations and a gallery that sells the vibe." data-sq="Menu e animuar, rezervime tavoline dhe një galeri që shet atmosferën.">Animated menu, table reservations and a gallery that sells the vibe.</p></div>
+          <p data-en="Digital menu, table reservations and a gallery that shows the atmosphere." data-sq="Menu dixhitale, rezervime tavoline dhe galeri që tregon atmosferën.">Digital menu, table reservations and a gallery that shows the atmosphere.</p></div>
         </article>
         <article class="pcard" style="--i:3">
-          <div class="thumb"><img loading="lazy" src="https://picsum.photos/seed/ijp4/580/360" alt="Nord Logistics"></div>
+          <div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&amp;fit=crop&amp;w=580&amp;h=360&amp;q=80" alt="Nord Logistics business portal"></div>
           <div class="body"><span class="tag" data-en="business portal" data-sq="portal biznesi">business portal</span><h3>Nord Logistics</h3>
-          <p data-en="Fleet dashboard and client area, fully bilingual and mobile-ready." data-sq="Panel flote dhe zonë klientësh, plotësisht dygjuhëshe.">Fleet dashboard and client area, fully bilingual and mobile-ready.</p></div>
+          <p data-en="Fleet dashboard and client area, bilingual and ready on phones." data-sq="Panel flote dhe zonë klientësh, dygjuhëshe dhe gati në telefon.">Fleet dashboard and client area, bilingual and ready on phones.</p></div>
         </article>
         <article class="pcard" style="--i:4">
-          <div class="thumb"><img loading="lazy" src="https://picsum.photos/seed/ijp5/580/360" alt="Studio Drin"></div>
+          <div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?auto=format&amp;fit=crop&amp;w=580&amp;h=360&amp;q=80" alt="Studio Drin photography portfolio"></div>
           <div class="body"><span class="tag" data-en="portfolio" data-sq="portofol">portfolio</span><h3>Studio Drin</h3>
-          <p data-en="A scroll-animated portfolio that made a photographer's work impossible to skip." data-sq="Portofol i animuar me scroll që e bën punën e fotografit të pamundur për t'u anashkaluar.">A scroll-animated portfolio that made a photographer's work impossible to skip.</p></div>
+          <p data-en="Scroll-led portfolio that puts the photographer's work front and center." data-sq="Portofol me scroll që e vendos punën e fotografit në qendër.">Scroll-led portfolio that puts the photographer's work front and center.</p></div>
         </article>
         <article class="pcard" style="--i:5">
-          <div class="thumb"><img loading="lazy" src="https://picsum.photos/seed/ijp6/580/360" alt="Faturo"></div>
+          <div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&amp;fit=crop&amp;w=580&amp;h=360&amp;q=80" alt="Faturo invoicing web app"></div>
           <div class="body"><span class="tag" data-en="web app" data-sq="aplikacion web">web app</span><h3>Faturo</h3>
-          <p data-en="Invoicing tool for small businesses — create, send and track in seconds." data-sq="Mjet faturimi për biznese të vogla — krijo, dërgo dhe gjurmo në sekonda.">Invoicing tool for small businesses — create, send and track in seconds.</p></div>
+          <p data-en="Invoicing for small businesses: create, send and track in seconds." data-sq="Faturim për biznese të vogla: krijo, dërgo dhe gjurmo në sekonda.">Invoicing for small businesses: create, send and track in seconds.</p></div>
         </article>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= WORK / DESK ================= -->
 <section class="work" id="work">
   <div class="container work-grid">
     <div class="desk-frame reveal" aria-hidden="true">
       <svg viewBox="0 0 560 380">
-        <!-- floor -->
-        <rect x="24" y="330" width="512" height="5" rx="2.5" fill="#1C2354"/>
-        <ellipse cx="280" cy="333" rx="200" ry="6" fill="#12173E"/>
-        <!-- plant (right corner) -->
-        <g>
-          <path class="fl-plant" d="M486 252 q-22 -36 4 -62 q7 32 9 62 q11 -32 33 -43 q-5 34 -24 49 Z"/>
-          <path class="fl-pot" d="M470 256 h58 l-9 50 q-20 9 -41 0 Z"/>
-          <ellipse cx="499" cy="256" rx="29" ry="6" fill="#8B54E8"/>
-        </g>
-        <!-- desk (shifted left so the character sits at the CENTER of the frame) -->
-        <rect class="fl-desk" x="74" y="210" width="252" height="18" rx="9"/>
-        <rect class="fl-desk2" x="90" y="228" width="16" height="102" rx="6"/>
-        <rect class="fl-desk2" x="296" y="228" width="16" height="102" rx="6"/>
-        <g>
-          <rect class="fl-desk2" x="106" y="234" width="72" height="70" rx="10"/>
-          <rect x="122" y="254" width="40" height="6" rx="3" fill="#414BA0"/>
-          <rect x="122" y="276" width="40" height="6" rx="3" fill="#414BA0"/>
-        </g>
-        <!-- monitor with code -->
-        <g>
-          <rect class="fl-frame" x="118" y="78" width="176" height="116" rx="16"/>
-          <rect class="fl-screen" x="128" y="88" width="156" height="96" rx="10"/>
-          <rect class="screen-glow" x="128" y="88" width="156" height="96" rx="10" fill="url(#glowGrad)" opacity="0"/>
-          <rect class="fl-frame" x="196" y="194" width="18" height="12"/>
-          <rect class="fl-frame" x="172" y="204" width="66" height="9" rx="4.5"/>
-          <line class="codeL k1" x1="142" y1="108" x2="212" y2="108"/>
-          <line class="codeL k2" x1="154" y1="128" x2="262" y2="128"/>
-          <line class="codeL k3" x1="154" y1="148" x2="232" y2="148"/>
-          <line class="codeL k4" x1="142" y1="168" x2="268" y2="168"/>
-          <!-- popping symbols while typing -->
-          <text class="sym s1" x="300" y="82">{ }</text>
-          <text class="sym s2" x="258" y="60">&lt;/&gt;</text>
-          <text class="sym s3" x="330" y="56">✦</text>
-        </g>
         <defs>
           <linearGradient id="glowGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#6C7BFF" stop-opacity=".25"/>
-            <stop offset="1" stop-color="#4BD8FF" stop-opacity=".12"/>
+            <stop offset="0" stop-color="#00e8ff" stop-opacity=".25"/>
+            <stop offset="1" stop-color="#00ced1" stop-opacity=".12"/>
           </linearGradient>
         </defs>
-        <!-- keyboard + mug -->
-        <rect x="244" y="200" width="58" height="10" rx="5" fill="#39428C"/>
-        <g>
-          <rect x="200" y="184" width="26" height="26" rx="7" fill="#A06BFF"/>
-          <path d="M226 189 q11 3 0 15" stroke="#A06BFF" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-          <path class="steam" d="M208 178 q-4 -8 2 -14"/>
-          <path class="steam" d="M218 178 q4 -8 -2 -14" style="animation-delay:-1.4s"/>
-        </g>
-
-        <!-- -- WALKING cartoon guy: bounces in from the right, stops at CENTER -- -->
+        <rect class="fl-floor" x="24" y="330" width="512" height="5" rx="2.5"/>
+        <ellipse class="fl-shadow" cx="280" cy="333" rx="200" ry="6"/>
+        <rect class="fl-desk" x="56" y="208" width="296" height="12" rx="4"/>
+        <rect class="fl-desk2" x="74" y="220" width="6" height="110" rx="3"/>
+        <rect class="fl-desk2" x="328" y="220" width="6" height="110" rx="3"/>
+        <rect class="fl-frame" x="138" y="68" width="152" height="98" rx="10"/>
+        <rect class="fl-screen" x="146" y="76" width="136" height="82" rx="6"/>
+        <rect class="screen-glow" x="146" y="76" width="136" height="82" rx="6" fill="url(#glowGrad)" opacity="0"/>
+        <rect class="fl-frame" x="208" y="166" width="12" height="10" rx="2"/>
+        <rect class="fl-frame" x="186" y="174" width="56" height="6" rx="3"/>
+        <rect class="fl-sticky" x="262" y="82" width="18" height="18" rx="2"/>
+        <line class="codeL k1" x1="158" y1="94" x2="228" y2="94"/>
+        <line class="codeL k2" x1="168" y1="110" x2="258" y2="110"/>
+        <line class="codeL k3" x1="168" y1="126" x2="238" y2="126"/>
+        <line class="codeL k4" x1="158" y1="142" x2="268" y2="142"/>
+        <text class="sym s1" x="292" y="72">{ }</text>
+        <text class="sym s2" x="252" y="52">&lt;/&gt;</text>
+        <text class="sym s3" x="318" y="48">✦</text>
+        <rect class="fl-keyboard" x="108" y="198" width="96" height="9" rx="3"/>
+        <rect class="fl-key" x="114" y="200" width="5" height="5" rx="1"/>
+        <rect class="fl-key" x="122" y="200" width="5" height="5" rx="1"/>
+        <rect class="fl-key" x="130" y="200" width="5" height="5" rx="1"/>
+        <rect class="fl-key" x="138" y="200" width="5" height="5" rx="1"/>
+        <rect class="fl-mousepad" x="206" y="198" width="36" height="22" rx="6"/>
+        <rect class="fl-mouse" x="218" y="202" width="12" height="18" rx="6"/>
+        <rect class="fl-laptop" x="278" y="196" width="58" height="7" rx="2"/>
+        <rect class="fl-laptop" x="282" y="188" width="50" height="4" rx="1" opacity=".7"/>
+        <rect class="fl-tech" x="418" y="214" width="28" height="10" rx="3"/>
+        <circle class="fl-tech" cx="432" cy="208" r="3"/>
+        <path class="fl-tech-wire" d="M404 218 L418 218" stroke-width="2"/>
+        <rect class="fl-tech" x="448" y="168" width="6" height="52" rx="3"/>
+        <path class="fl-headphones" d="M448 172 q-18 0 -18 16 v10 q0 8 8 8 h4 v-18 Z"/>
+        <path class="fl-headphones" d="M454 172 q18 0 18 16 v10 q0 8 -8 8 h-4 v-18 Z"/>
         <g id="walker2">
           <g class="wBounce">
-            <!-- legs (chunky, round) -->
-            <g class="wleg1" style="transform-box:view-box;transform-origin:302px 258px">
-              <path class="limb" d="M302 258 L302 314" stroke="#2B3474" stroke-width="15"/>
-              <rect class="fl-hair" x="290" y="312" width="30" height="12" rx="6"/>
+            <g class="wleg1" style="transform-box:view-box;transform-origin:308px 252px">
+              <path class="limb fl-pants" d="M308 252 L298 306" stroke-width="13"/>
+              <rect class="fl-shoe" x="286" y="304" width="22" height="9" rx="4.5"/>
             </g>
-            <g class="wleg2" style="transform-box:view-box;transform-origin:302px 258px">
-              <path class="limb" d="M302 258 L302 314" stroke="#232A5E" stroke-width="15"/>
-              <rect class="fl-hair" x="290" y="312" width="30" height="12" rx="6"/>
+            <g class="wleg2" style="transform-box:view-box;transform-origin:322px 252px">
+              <path class="limb fl-pants2" d="M322 252 L332 306" stroke-width="13"/>
+              <rect class="fl-shoe" x="326" y="304" width="22" height="9" rx="4.5"/>
             </g>
-            <!-- torso -->
-            <rect class="fl-shirt" x="282" y="186" width="40" height="80" rx="19"/>
-            <rect class="fl-shirt2" x="282" y="232" width="40" height="14" rx="7"/>
-            <!-- arms -->
-            <g class="warm1" style="transform-box:view-box;transform-origin:302px 198px">
-              <path class="limb" d="M302 198 L296 252" stroke="#5866E0" stroke-width="12"/>
-              <circle class="fl-skin" cx="296" cy="254" r="7"/>
+            <rect class="fl-shirt" x="304" y="190" width="32" height="66" rx="14"/>
+            <rect class="fl-shirt2" x="304" y="232" width="32" height="12" rx="6"/>
+            <g class="warm1" style="transform-box:view-box;transform-origin:308px 194px">
+              <path class="limb fl-sleeve" d="M308 194 L280 242" stroke-width="10"/>
+              <circle class="fl-skin" cx="278" cy="244" r="6"/>
             </g>
-            <g class="warm2" style="transform-box:view-box;transform-origin:302px 198px">
-              <path class="limb" d="M302 198 L310 252" stroke="#6C7BFF" stroke-width="12"/>
-              <circle class="fl-skin" cx="310" cy="254" r="7"/>
+            <g class="warm2" style="transform-box:view-box;transform-origin:322px 194px">
+              <path class="limb fl-sleeve2" d="M322 194 L344 240" stroke-width="10"/>
+              <circle class="fl-skin" cx="346" cy="242" r="6"/>
             </g>
-            <!-- big happy head, wobbling -->
-            <g class="wHead" style="transform-box:view-box;transform-origin:302px 178px">
-              <circle class="fl-skin" cx="302" cy="152" r="26"/>
-              <path class="fl-hair" d="M276 148 a26 26 0 0 1 52 0 q-2 -11 -10 -13 q-15 -11 -32 0 q-8 2 -10 13 Z"/>
-              <path class="fl-hair" d="M322 128 q8 -6 12 2 q-6 1 -9 5 Z"/>
+            <g class="wHead" style="transform-box:view-box;transform-origin:316px 168px">
+              <circle class="fl-skin" cx="316" cy="146" r="21"/>
+              <path class="fl-hair" d="M295 142 a21 21 0 0 1 42 0 q-2 -9 -8 -11 q-12 -9 -26 0 q-6 2 -8 11 Z"/>
+              <path class="fl-hair" d="M334 124 q6 -5 10 2 q-5 1 -8 4 Z"/>
               <g class="eyes">
-                <circle cx="288" cy="150" r="3.4" fill="#1C2354"/>
-                <circle cx="302" cy="149" r="3.4" fill="#1C2354"/>
+                <circle cx="304" cy="144" r="3" fill="#222226"/>
+                <circle cx="316" cy="143" r="3" fill="#222226"/>
               </g>
-              <path d="M286 163 q8 7 17 3" stroke="#C4855C" stroke-width="3" fill="none" stroke-linecap="round"/>
-              <circle cx="311" cy="160" r="4.5" fill="#F2989B" opacity=".55"/>
+              <path d="M302 156 q7 6 15 2" stroke="#C4855C" stroke-width="2.5" fill="none" stroke-linecap="round"/>
             </g>
           </g>
         </g>
-
-        <!-- -- SITTING cartoon guy at the CENTER: plops down, then types -- -->
         <g id="sitter2">
-          <!-- office chair (squishes on landing) -->
           <g class="chairSquish">
-            <rect class="fl-chair" x="336" y="188" width="16" height="88" rx="8"/>
-            <rect class="fl-chair" x="280" y="262" width="72" height="16" rx="8"/>
-            <rect class="fl-chair" x="308" y="276" width="14" height="38"/>
-            <path class="limb" d="M288 322 L315 306 L342 322" stroke="#4335A0" stroke-width="10"/>
-            <circle cx="288" cy="324" r="7" fill="#33285E"/>
-            <circle cx="342" cy="324" r="7" fill="#33285E"/>
+            <rect class="fl-chair" x="342" y="176" width="10" height="80" rx="5"/>
+            <rect class="fl-chair" x="288" y="256" width="68" height="12" rx="6"/>
+            <rect class="fl-chair" x="314" y="268" width="8" height="34" rx="4"/>
+            <path class="fl-chair-base" d="M298 302 L330 290 L362 302" stroke-width="8"/>
+            <circle class="fl-chair-wheel" cx="298" cy="304" r="5"/>
+            <circle class="fl-chair-wheel" cx="362" cy="304" r="5"/>
           </g>
           <g class="plop">
-            <!-- legs tucked under the desk -->
-            <path class="limb" d="M306 258 L262 262 L262 312" stroke="#232A5E" stroke-width="15"/>
-            <rect class="fl-hair" x="242" y="310" width="30" height="12" rx="6"/>
-            <path class="limb" d="M310 260 L276 266 L276 314" stroke="#2B3474" stroke-width="15"/>
-            <rect class="fl-hair" x="256" y="312" width="30" height="12" rx="6"/>
-            <!-- torso -->
-            <rect class="fl-shirt" x="288" y="184" width="40" height="84" rx="19"/>
-            <rect class="fl-shirt2" x="288" y="234" width="40" height="14" rx="7"/>
-            <!-- typing arms reach the keyboard -->
-            <g class="tArm1" style="transform-box:view-box;transform-origin:296px 202px">
-              <path class="limb" d="M296 202 Q272 214 258 202" stroke="#5866E0" stroke-width="12"/>
-              <circle class="fl-skin" cx="257" cy="202" r="7"/>
+            <path class="limb fl-pants" d="M306 248 L264 252 L264 302" stroke-width="13"/>
+            <rect class="fl-shoe" x="250" y="300" width="22" height="9" rx="4.5"/>
+            <path class="limb fl-pants2" d="M318 250 L318 268 L318 302" stroke-width="13"/>
+            <rect class="fl-shoe" x="308" y="300" width="22" height="9" rx="4.5"/>
+            <rect class="fl-shirt" x="300" y="186" width="32" height="68" rx="14"/>
+            <rect class="fl-shirt2" x="300" y="230" width="32" height="12" rx="6"/>
+            <g class="tArm1" style="transform-box:view-box;transform-origin:304px 192px">
+              <path class="limb fl-sleeve" d="M304 192 L262 206 L168 204" stroke-width="10"/>
+              <circle class="fl-skin" cx="166" cy="204" r="6"/>
             </g>
-            <g class="tArm2" style="transform-box:view-box;transform-origin:296px 212px">
-              <path class="limb" d="M296 212 Q276 226 264 212" stroke="#6C7BFF" stroke-width="12"/>
-              <circle class="fl-skin" cx="263" cy="212" r="7"/>
+            <g class="tArm2" style="transform-box:view-box;transform-origin:316px 198px">
+              <path class="limb fl-sleeve2" d="M316 198 L252 212 L218 206" stroke-width="10"/>
+              <circle class="fl-skin" cx="216" cy="206" r="6"/>
             </g>
-            <!-- big head bobbing to the typing beat -->
-            <g class="headBob" style="transform-box:view-box;transform-origin:308px 176px">
-              <circle class="fl-skin" cx="308" cy="150" r="26"/>
-              <path class="fl-hair" d="M282 146 a26 26 0 0 1 52 0 q-2 -11 -10 -13 q-15 -11 -32 0 q-8 2 -10 13 Z"/>
-              <path class="fl-hair" d="M328 126 q8 -6 12 2 q-6 1 -9 5 Z"/>
-              <!-- headphones -->
-              <path d="M284 142 a24 24 0 0 1 48 0" stroke="#33285E" stroke-width="5" fill="none" stroke-linecap="round"/>
-              <rect x="278" y="140" width="9" height="18" rx="4.5" fill="#4335A0"/>
-              <rect x="329" y="140" width="9" height="18" rx="4.5" fill="#4335A0"/>
+            <g class="headBob" style="transform-box:view-box;transform-origin:312px 164px">
+              <circle class="fl-skin" cx="312" cy="142" r="21"/>
+              <path class="fl-hair" d="M291 138 a21 21 0 0 1 42 0 q-2 -9 -8 -11 q-12 -9 -26 0 q-6 2 -8 11 Z"/>
+              <path class="fl-hair" d="M330 120 q6 -5 10 2 q-5 1 -8 4 Z"/>
+              <path class="fl-headband" d="M288 134 a22 22 0 0 1 48 0" stroke-width="4"/>
+              <rect class="fl-earcup" x="284" y="132" width="8" height="14" rx="4"/>
+              <rect class="fl-earcup" x="332" y="132" width="8" height="14" rx="4"/>
               <g class="eyes">
-                <circle cx="294" cy="148" r="3.4" fill="#1C2354"/>
-                <circle cx="308" cy="147" r="3.4" fill="#1C2354"/>
+                <circle cx="300" cy="140" r="3" fill="#222226"/>
+                <circle cx="312" cy="139" r="3" fill="#222226"/>
               </g>
-              <path d="M292 161 q8 7 17 3" stroke="#C4855C" stroke-width="3" fill="none" stroke-linecap="round"/>
-              <circle cx="317" cy="158" r="4.5" fill="#F2989B" opacity=".55"/>
+              <path d="M298 152 q7 6 15 2" stroke="#C4855C" stroke-width="2.5" fill="none" stroke-linecap="round"/>
             </g>
           </g>
         </g>
       </svg>
     </div>
     <div class="work-copy reveal d1">
-      <span class="eyebrow" data-en="Someone is always at the desk" data-sq="Dikush është gjithmonë në tavolinë">Someone is always at the desk</span>
-      <h2 data-en="While you sleep, we build." data-sq="Ndërsa ti fle, ne ndërtojmë.">While you sleep, <span class="grad-text">we build.</span></h2>
-      <p data-en="Every project starts with a sketch and ends with something alive on the internet. In between: design, code, testing on every screen size, and a launch we handle together."
-         data-sq="Çdo projekt nis me një skicë dhe përfundon me diçka të gjallë në internet. Ndërmjet tyre: dizajni, kodi, testimi në çdo madhësi ekrani dhe një nisje që e bëjmë bashkë.">
-        Every project starts with a sketch and ends with something alive on the internet. In between: design, code, testing on every screen size, and a launch we handle together.
+      <h2 data-en="One team from sketch to launch." data-sq="Një ekip nga skica deri te nisja.">One team from sketch to launch.</h2>
+      <p data-en="Every project moves through design, build, testing on real devices and a launch we handle together. You see progress every week, not a surprise at the end."
+         data-sq="Çdo projekt kalon nëpër dizajn, ndërtim, testim në pajisje reale dhe një nisje që e bëjmë bashkë. E sheh progresin çdo javë, jo një surprizë në fund.">
+        Every project moves through design, build, testing on real devices and a launch we handle together. You see progress every week, not a surprise at the end.
       </p>
       <ul class="feature-list">
-        <li><span class="ic"><svg viewBox="0 0 24 24"><path d="M13 2 L4 14 h6 l-1 8 9-12 h-6 z"/></svg></span><span data-en="Design, code, hosting and maintenance — one team, one place, zero headaches." data-sq="Dizajn, kod, hostim dhe mirëmbajtje — një ekip, një vend, zero kokëçarje.">Design, code, hosting and maintenance — one team, one place, zero headaches.</span></li>
-        <li><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12 h18 M12 3 c3 3 3 15 0 18 c-3 -3 -3 -15 0 -18"/></svg></span><span data-en="Two languages by default, more whenever you need them." data-sq="Dy gjuhë si standard, më shumë kurdo që të nevojiten.">Two languages by default, more whenever you need them.</span></li>
-        <li><span class="ic"><svg viewBox="0 0 24 24"><path d="M2 12 s3.5-6 10-6 10 6 10 6 -3.5 6-10 6 -10-6-10-6 z"/><circle cx="12" cy="12" r="2.6"/></svg></span><span data-en="You see live progress every week — not a surprise at the end." data-sq="E sheh progresin çdo javë — jo një surprizë në fund.">You see live progress every week — not a surprise at the end.</span></li>
+        <li><span class="ic"><svg viewBox="0 0 24 24"><path d="M13 2 L4 14 h6 l-1 8 9-12 h-6 z"/></svg></span><span data-en="Design, code, hosting and maintenance in one place." data-sq="Dizajn, kod, hostim dhe mirëmbajtje në një vend.">Design, code, hosting and maintenance in one place.</span></li>
+        <li><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12 h18 M12 3 c3 3 3 15 0 18 c-3 -3 -3 -15 0 -18"/></svg></span><span data-en="Albanian and English by default. More languages when you need them." data-sq="Shqip dhe anglisht si standard. Më shumë gjuhë kur të nevojiten.">Albanian and English by default. More languages when you need them.</span></li>
+        <li><span class="ic"><svg viewBox="0 0 24 24"><path d="M2 12 s3.5-6 10-6 10 6 10 6 -3.5 6-10 6 -10-6-10-6 z"/><circle cx="12" cy="12" r="2.6"/></svg></span><span data-en="Weekly check-ins so you always know where things stand." data-sq="Takime javore që të dish gjithmonë ku ndodhemi.">Weekly check-ins so you always know where things stand.</span></li>
       </ul>
     </div>
   </div>
 </section>
 
-<!-- ================= CLIENTS ================= -->
 <section class="clients" id="clients">
   <div class="container sec-head center reveal">
-    <span class="eyebrow" data-en="Real people · real results" data-sq="Njerëz realë · rezultate reale">Real people · real results</span>
-    <h2 data-en="Happy clients" data-sq="Klientë të kënaqur">Happy <span class="grad-text">clients</span></h2>
+    <h2 data-en="What clients say" data-sq="Çfarë thonë klientët">What clients say</h2>
   </div>
-  <div class="marquee" id="marquee">
-    <div class="tcard"><span class="stars">★★★★★</span>
-      <p data-en="“They took a photo of a napkin drawing and gave us back a shop that sells while we sleep. Sales are up 60% since launch.”" data-sq="“Morën një foto të një vizatimi në pecetë dhe na kthyen një dyqan që shet ndërsa ne flemë. Shitjet janë rritur 60% që nga nisja.”">“They took a photo of a napkin drawing and gave us back a shop that sells while we sleep. Sales are up 60% since launch.”</p>
-      <div class="who"><img src="https://i.pravatar.cc/100?img=47" alt=""><span><b>Bora K.</b><span>Buna Market</span></span></div>
-    </div>
-    <div class="tcard"><span class="stars">★★★★★</span>
-      <p data-en="“Bookings doubled in the first season. Guests keep mentioning how smooth and beautiful the site feels on their phones.”" data-sq="“Rezervimet u dyfishuan në sezonin e parë. Vizitorët vazhdojnë të përmendin sa e rrjedhshme dhe e bukur ndihet faqja në telefon.”">“Bookings doubled in the first season. Guests keep mentioning how smooth and beautiful the site feels on their phones.”</p>
-      <div class="who"><img src="https://i.pravatar.cc/100?img=12" alt=""><span><b>Arben D.</b><span>Alpet Stay</span></span></div>
-    </div>
-    <div class="tcard"><span class="stars">★★★★★</span>
-      <p data-en="“Fast, honest and patient with our hundred changes. The animated menu is basically our best waiter now.”" data-sq="“Të shpejtë, të ndershëm dhe të duruar me qindra ndryshimet tona. Menuja e animuar është praktikisht kamarieri ynë më i mirë.”">“Fast, honest and patient with our hundred changes. The animated menu is basically our best waiter now.”</p>
-      <div class="who"><img src="https://i.pravatar.cc/100?img=32" alt=""><span><b>Teuta M.</b><span>Tavolina 12</span></span></div>
-    </div>
-    <div class="tcard"><span class="stars">★★★★★</span>
-      <p data-en="“One team for design, code and hosting. We finally stopped juggling three different companies for one website.”" data-sq="“Një ekip për dizajn, kod dhe hostim. Më në fund nuk vrapojmë pas tre kompanive të ndryshme për një faqe.”">“One team for design, code and hosting. We finally stopped juggling three different companies for one website.”</p>
-      <div class="who"><img src="https://i.pravatar.cc/100?img=68" alt=""><span><b>Nik P.</b><span>Nord Logistics</span></span></div>
+  <div class="marquee-wrap" aria-label="Client testimonials">
+    <div class="marquee" id="marquee">
+      <div class="tcard"><span class="stars" aria-hidden="true">★★★★★</span>
+        <p data-en="They took a napkin sketch and gave us a shop that sells while we sleep. Sales are up 60% since launch." data-sq="Morën një skicë në pecetë dhe na dhanë një dyqan që shet ndërsa ne flemë. Shitjet janë rritur 60% që nga nisja.">They took a napkin sketch and gave us a shop that sells while we sleep. Sales are up 60% since launch.</p>
+        <div class="who"><span class="avatar" aria-hidden="true">BK</span><span><b>Bora K.</b><span>Buna Market</span></span></div>
+      </div>
+      <div class="tcard"><span class="stars" aria-hidden="true">★★★★★</span>
+        <p data-en="Bookings doubled in the first season. Guests keep mentioning how smooth the site feels on their phones." data-sq="Rezervimet u dyfishuan në sezonin e parë. Vizitorët vazhdojnë të përmendin sa e rrjedhshme ndihet faqja në telefon.">Bookings doubled in the first season. Guests keep mentioning how smooth the site feels on their phones.</p>
+        <div class="who"><span class="avatar" aria-hidden="true">AD</span><span><b>Arben D.</b><span>Alpet Stay</span></span></div>
+      </div>
+      <div class="tcard"><span class="stars" aria-hidden="true">★★★★★</span>
+        <p data-en="Fast, honest and patient with our changes. The digital menu is now part of how we serve guests." data-sq="Të shpejtë, të ndershëm dhe të duruar me ndryshimet tona. Menuja dixhitale tani është pjesë e mënyrës si u shërbejmë vizitorëve.">Fast, honest and patient with our changes. The digital menu is now part of how we serve guests.</p>
+        <div class="who"><span class="avatar" aria-hidden="true">TM</span><span><b>Teuta M.</b><span>Tavolina 12</span></span></div>
+      </div>
+      <div class="tcard"><span class="stars" aria-hidden="true">★★★★★</span>
+        <p data-en="One team for design, code and hosting. We stopped juggling three companies for one website." data-sq="Një ekip për dizajn, kod dhe hostim. Ndaluam së vrapuari pas tre kompanive për një faqe.">One team for design, code and hosting. We stopped juggling three companies for one website.</p>
+        <div class="who"><span class="avatar" aria-hidden="true">NP</span><span><b>Nik P.</b><span>Nord Logistics</span></span></div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ================= OFFERS ================= -->
 <section class="offers" id="offers">
   <div class="container">
     <div class="sec-head center reveal">
-      <span class="eyebrow" data-en="Pick your size — we tailor the rest" data-sq="Zgjidh masën — pjesën tjetër e qepim ne">Pick your size — we tailor the rest</span>
-      <h2 data-en="What we offer" data-sq="Çfarë ofrojmë">What we <span class="grad-text">offer</span></h2>
-      <p class="sub" data-en="Clear packages, clear prices, no surprises. Every plan includes responsive design, animations and our support after launch." data-sq="Paketa të qarta, çmime të qarta, pa surpriza. Çdo plan përfshin dizajn responsiv, animacione dhe suportin tonë pas nisjes.">Clear packages, clear prices, no surprises. Every plan includes responsive design, animations and our support after launch.</p>
+      <h2 data-en="Clear packages, clear prices" data-sq="Paketa të qarta, çmime të qarta">Clear packages, clear prices</h2>
+      <p class="sub" data-en="Every plan includes responsive design and support after launch. Pick a starting point and we tailor the rest." data-sq="Çdo plan përfshin dizajn responsiv dhe suport pas nisjes. Zgjidh një pikënisje dhe pjesën tjetër e përshtatim ne.">Every plan includes responsive design and support after launch. Pick a starting point and we tailor the rest.</p>
     </div>
     <div class="offer-grid">
       <div class="plan reveal">
         <h3>Basic</h3>
         <div class="price">€290</div>
-        <div class="per" data-en="one-time · delivered in ~2 weeks" data-sq="pagesë e vetme · dorëzim ~2 javë">one-time · delivered in ~2 weeks</div>
+        <div class="per" data-en="one-time · ~2 weeks" data-sq="pagesë e vetme · ~2 javë">one-time · ~2 weeks</div>
         <ul>
-          <li data-en="One-page animated website" data-sq="Faqe interneti një-faqëshe e animuar">One-page animated website</li>
-          <li data-en="Mobile-first &amp; fast loading" data-sq="Së pari për celular &amp; hapje e shpejtë">Mobile-first &amp; fast loading</li>
-          <li data-en="Contact form, map &amp; socials" data-sq="Formular kontakti, hartë &amp; rrjete sociale">Contact form, map &amp; socials</li>
+          <li data-en="One-page website" data-sq="Faqe interneti një-faqëshe">One-page website</li>
+          <li data-en="Mobile-first and fast loading" data-sq="Së pari për celular dhe e shpejtë">Mobile-first and fast loading</li>
+          <li data-en="Contact form, map and socials" data-sq="Formular kontakti, hartë dhe rrjete sociale">Contact form, map and socials</li>
           <li data-en="1 language" data-sq="1 gjuhë">1 language</li>
         </ul>
-        <a class="btn" href="#contact" data-en="Start with Basic" data-sq="Nis me Basic">Start with Basic</a>
+        <a class="btn plan-cta" href="#contact" data-plan="Basic" data-en="Start with Basic" data-sq="Nis me Basic">Start with Basic</a>
       </div>
       <div class="plan pro reveal d1">
         <span class="flag" data-en="Most chosen" data-sq="Më i zgjedhuri">Most chosen</span>
         <h3>Pro</h3>
-        <div class="price grad-text">€690</div>
-        <div class="per" data-en="one-time · delivered in ~4 weeks" data-sq="pagesë e vetme · dorëzim ~4 javë">one-time · delivered in ~4 weeks</div>
+        <div class="price">€690</div>
+        <div class="per" data-en="one-time · ~4 weeks" data-sq="pagesë e vetme · ~4 javë">one-time · ~4 weeks</div>
         <ul>
-          <li data-en="Multi-page site with animations" data-sq="Faqe me shumë seksione dhe animacione">Multi-page site with animations</li>
+          <li data-en="Multi-page site" data-sq="Faqe me shumë seksione">Multi-page site</li>
           <li data-en="Two languages (ALB / ENG)" data-sq="Dy gjuhë (SHQ / ENG)">Two languages (ALB / ENG)</li>
           <li data-en="Booking or product catalogue" data-sq="Rezervime ose katalog produktesh">Booking or product catalogue</li>
-          <li data-en="Basic SEO + Google setup" data-sq="SEO bazë + konfigurim në Google">Basic SEO + Google setup</li>
+          <li data-en="Basic SEO and Google setup" data-sq="SEO bazë dhe konfigurim Google">Basic SEO and Google setup</li>
           <li data-en="1 year hosting included" data-sq="1 vit hostim i përfshirë">1 year hosting included</li>
         </ul>
-        <a class="btn primary" href="#contact" data-en="Go Pro" data-sq="Kalo në Pro">Go Pro</a>
+        <a class="btn primary plan-cta" href="#contact" data-plan="Pro" data-en="Go Pro" data-sq="Kalo në Pro">Go Pro</a>
       </div>
       <div class="plan reveal d2">
         <h3>Premium</h3>
-        <div class="price" data-en="Custom" data-sq="Me ofertë">Custom</div>
-        <div class="per" data-en="tailored scope &amp; timeline" data-sq="përmbajtje &amp; afate sipas nevojës">tailored scope &amp; timeline</div>
+        <div class="price" data-en="From €1,490" data-sq="Nga €1.490">From €1,490</div>
+        <div class="per" data-en="scope and timeline tailored" data-sq="përmbajtje dhe afate sipas nevojës">scope and timeline tailored</div>
         <ul>
           <li data-en="Online shop or custom web app" data-sq="Dyqan online ose aplikacion i personalizuar">Online shop or custom web app</li>
-          <li data-en="Payments, accounts &amp; dashboards" data-sq="Pagesa, llogari &amp; panele kontrolli">Payments, accounts &amp; dashboards</li>
+          <li data-en="Payments, accounts and dashboards" data-sq="Pagesa, llogari dhe panele">Payments, accounts and dashboards</li>
           <li data-en="Unlimited languages" data-sq="Gjuhë pa kufi">Unlimited languages</li>
-          <li data-en="Priority support &amp; maintenance" data-sq="Suport me përparësi &amp; mirëmbajtje">Priority support &amp; maintenance</li>
+          <li data-en="Priority support and maintenance" data-sq="Suport me përparësi dhe mirëmbajtje">Priority support and maintenance</li>
         </ul>
-        <a class="btn" href="#contact" data-en="Talk to us" data-sq="Fol me ne">Talk to us</a>
+        <a class="btn plan-cta" href="#contact" data-plan="Premium" data-en="Talk to us" data-sq="Fol me ne">Talk to us</a>
       </div>
     </div>
+    <p class="pricing-note reveal" data-en="Prices are one-time project fees. Hosting renewal after the first year is quoted separately. VAT applied where required." data-sq="Çmimet janë tarifa projekti një herë. Rinovimi i hostimit pas vitit të parë kuotohet veçmas. TVSH aplikohet ku kërkohet.">Prices are one-time project fees. Hosting renewal after the first year is quoted separately. VAT applied where required.</p>
   </div>
 </section>
 
-<!-- ================= SUIT ================= -->
 <section class="suit">
   <div class="container">
     <div class="suit-inner reveal">
-      <div class="suit-img"><img src="https://picsum.photos/seed/ijsuit/900/900" alt=""></div>
+      <div class="suit-img"><img src="https://images.unsplash.com/photo-1558171813-4c088754af8f?auto=format&amp;fit=crop&amp;w=900&amp;h=900&amp;q=80" alt="Tailor measuring fabric for a custom fit"></div>
       <div class="suit-copy">
-        <span class="eyebrow" data-en="Specialized" data-sq="Të specializuar">Specialized</span>
-        <h2 data-en="Tailor your website like a suit." data-sq="Qepe faqen tënde si një kostum.">Tailor your website <span class="grad-text">like a suit.</span></h2>
-        <p data-en="No two businesses have the same measurements, so we never sell the same website twice. We take your colours, your voice and your goals, cut everything to fit — and stitch every detail until it fits you and only you."
-           data-sq="Asnjë biznes nuk ka të njëjtat masa, prandaj ne nuk shesim kurrë dy herë të njëjtën faqe. Marrim ngjyrat e tua, zërin tënd dhe qëllimet e tua, e presim gjithçka sipas masës — dhe e qepim çdo detaj derisa të të rrijë ty dhe vetëm ty.">
-          No two businesses have the same measurements, so we never sell the same website twice. We take your colours, your voice and your goals, cut everything to fit — and stitch every detail until it fits you and only you.
+        <h2 data-en="Tailored to your business, not a template." data-sq="E përshtatur për biznesin tënd, jo një shabllon.">Tailored to your business, not a template.</h2>
+        <p data-en="We take your colours, voice and goals, then build something that fits how you actually work. No two sites leave our studio looking the same."
+           data-sq="Marrim ngjyrat, zërin dhe qëllimet e tua, pastaj ndërtojmë diçka që i përshtatet mënyrës si punon realisht. Asnjë faqe nuk del nga studioja jonë e njëjtë.">
+          We take your colours, voice and goals, then build something that fits how you actually work. No two sites leave our studio looking the same.
         </p>
-        <a class="btn primary" href="#contact" data-en="Get measured — it's free" data-sq="Merr masat — falas">Get measured — it's free</a>
+        <a class="btn primary plan-cta" href="#contact" data-plan="" data-en="Book a free call" data-sq="Rezervo një telefonatë falas">Book a free call</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= CONTACT (form posts to the backend) ================= -->
 <section class="contact" id="contact">
   <div class="container">
     <div class="contact-inner">
       <div class="sec-head center reveal">
-        <span class="eyebrow" data-en="Tell us about your project" data-sq="Na trego për projektin tënd">Tell us about your project</span>
-        <h2 data-en="Let's build something" data-sq="Le të ndërtojmë diçka">Let's build <span class="grad-text">something</span></h2>
-        <p class="sub" data-en="Send us a message and we'll reply within a day. No forms lost in the void — it lands straight in our inbox." data-sq="Na dërgo një mesazh dhe të kthehemi brenda një dite. Asnjë formular i humbur — shkon drejt e te ne.">Send us a message and we'll reply within a day. No forms lost in the void — it lands straight in our inbox.</p>
+        <h2 data-en="Tell us about your project" data-sq="Na trego për projektin tënd">Tell us about your project</h2>
+        <p class="sub" data-en="We reply within one business day. Your message goes straight to our inbox." data-sq="Të kthehemi brenda një dite pune. Mesazhi yt shkon drejt te ne.">We reply within one business day. Your message goes straight to our inbox.</p>
+      </div>
+      <div class="contact-steps reveal" aria-hidden="true">
+        <span data-en="1. Send details" data-sq="1. Dërgo detajet">1. Send details</span>
+        <span data-en="2. We reply with next steps" data-sq="2. Përgjigjemi me hapat">2. We reply with next steps</span>
+        <span data-en="3. Start when you're ready" data-sq="3. Nis kur të jesh gati">3. Start when you're ready</span>
       </div>
       <form class="contact-form reveal d1" id="contactForm" novalidate>
         <div class="field row">
-          <div class="field">
+          <div class="field" id="field-name">
             <label for="cf-name" data-en="Name" data-sq="Emri">Name</label>
             <input id="cf-name" name="name" type="text" autocomplete="name" required
                    data-en="Your name" data-sq="Emri yt" placeholder="Your name">
+            <span class="field-error" id="err-name" role="alert"></span>
           </div>
-          <div class="field">
+          <div class="field" id="field-email">
             <label for="cf-email" data-en="Email" data-sq="Email">Email</label>
-            <input id="cf-email" name="email" type="email" autocomplete="email" required
-                   placeholder="you@example.com">
+            <input id="cf-email" name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+            <span class="field-error" id="err-email" role="alert"></span>
           </div>
         </div>
-        <div class="field">
+        <div class="field" id="field-package">
+          <label for="cf-package" data-en="Package" data-sq="Paketa">Package</label>
+          <select id="cf-package" name="package">
+            <option value="" data-en="Not sure yet" data-sq="Ende nuk jam i sigurt">Not sure yet</option>
+            <option value="Basic">Basic (€290)</option>
+            <option value="Pro">Pro (€690)</option>
+            <option value="Premium">Premium (custom)</option>
+          </select>
+        </div>
+        <div class="field" id="field-message">
           <label for="cf-message" data-en="Message" data-sq="Mesazhi">Message</label>
           <textarea id="cf-message" name="message" required
-                    data-en="Tell us what you'd like to build…" data-sq="Na trego çfarë do të ndërtosh…"
-                    placeholder="Tell us what you'd like to build…"></textarea>
+                    data-en="What would you like to build?" data-sq="Çfarë do të ndërtosh?"
+                    placeholder="What would you like to build?"></textarea>
+          <span class="field-error" id="err-message" role="alert"></span>
         </div>
         <button class="btn primary" type="submit" data-en="Send message" data-sq="Dërgo mesazhin">Send message</button>
         <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
@@ -428,30 +422,31 @@
 
 </main>
 
-<!-- ================= FOOTER ================= -->
+<a class="contact-fab" href="#contact" data-en="Contact" data-sq="Kontakt">Contact</a>
+
 <footer>
   <div class="container">
     <div class="foot-grid">
       <div>
-        <a class="logo" href="#top"><span class="mark">IJ</span><span>Technologys</span></a>
-        <p data-en="A web studio building websites, shops and digital tools that move — for businesses that want to be seen everywhere." data-sq="Një studio web që ndërton faqe, dyqane dhe mjete dixhitale që lëvizin — për biznese që duan të shihen kudo.">A web studio building websites, shops and digital tools that move — for businesses that want to be seen everywhere.</p>
+        <a class="logo" href="#top"><img src="/images/logo.png" alt="IJ Technologys"><span>Technologys</span></a>
+        <p data-en="A web studio building websites, shops and digital tools for businesses across the region." data-sq="Një studio web që ndërton faqe, dyqane dhe mjete dixhitale për biznese në rajon.">A web studio building websites, shops and digital tools for businesses across the region.</p>
       </div>
       <div class="foot-col">
-        <h4>Instagram</h4>
-        <a href="https://instagram.com/ijtechnologys" target="_blank" rel="noopener"><span class="ic">◎</span>@ijtechnologys</a>
+        <h3>Instagram</h3>
+        <a href="https://instagram.com/ijtechnologys" target="_blank" rel="noopener noreferrer"><span class="ic" aria-hidden="true">◎</span>@ijtechnologys</a>
       </div>
       <div class="foot-col">
-        <h4>Email</h4>
-        <a href="mailto:hello@ijtechnologys.com"><span class="ic">✉</span>hello@ijtechnologys.com</a>
+        <h3>Email</h3>
+        <a href="mailto:hello@ijtechnologys.com"><span class="ic" aria-hidden="true">✉</span>hello@ijtechnologys.com</a>
       </div>
       <div class="foot-col">
-        <h4 data-en="Phone" data-sq="Telefon">Phone</h4>
-        <a href="tel:+355690000000"><span class="ic">✆</span>+355 69 000 0000</a>
+        <h3 data-en="Phone" data-sq="Telefon">Phone</h3>
+        <a href="mailto:hello@ijtechnologys.com?subject=Call%20request"><span class="ic" aria-hidden="true">✆</span><span data-en="Request a call" data-sq="Kërko një telefonatë">Request a call</span></a>
       </div>
     </div>
     <div class="foot-note">
       <span data-en="© 2026 IJ Technologys. All rights reserved." data-sq="© 2026 IJ Technologys. Të gjitha të drejtat e rezervuara.">© 2026 IJ Technologys. All rights reserved.</span>
-      <span data-en="Designed &amp; built by ourselves — of course." data-sq="Dizenjuar &amp; ndërtuar nga ne vetë — natyrisht.">Designed &amp; built by ourselves — of course.</span>
+      <span data-en="Designed and built by us." data-sq="Dizenjuar dhe ndërtuar nga ne.">Designed and built by us.</span>
     </div>
   </div>
 </footer>
