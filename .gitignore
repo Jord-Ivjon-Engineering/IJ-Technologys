@@ -6,5 +6,11 @@ Desktop.ini
 .vscode/
 .idea/
 
-# Node (present only as a placeholder here)
+# Node
 node_modules/
+
+# Env & secrets
+.env
+
+# Runtime data (contact submissions)
+backend/data/
