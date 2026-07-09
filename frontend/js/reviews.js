@@ -27,20 +27,27 @@
       + '<div class="who"><span class="avatar" aria-hidden="true">' + escapeHtml(initials(r.name)) + '</span>'
       + '<span><b>' + escapeHtml(r.name || 'Anonymous') + '</b><span>' + escapeHtml(r.role || 'Client') + '</span></span></div></div>';
   }
-  /* feed cards into the marquee's repeating source, then rebuild the loop */
-  function addCards(html, prepend){
-    if(!marquee || !html) return;
-    if(!marquee.dataset.orig) marquee.dataset.orig = marquee.innerHTML;
-    marquee.dataset.orig = prepend ? html + marquee.dataset.orig : marquee.dataset.orig + html;
-    if(typeof buildMarquees === 'function') buildMarquees();
+  /* Render each review exactly once — no duplication/looping. Cards sit in a
+     static, centered row that wraps as more reviews come in. */
+  const items = []; // newest first
+  function render(){
+    if(!marquee) return;
+    marquee.classList.add('is-static');
+    marquee.innerHTML = items.map(cardHTML).join('');
+  }
+  function addReview(r, toFront){
+    if(!r) return;
+    if(toFront) items.unshift(r); else items.push(r);
+    render();
   }
 
-  /* ---- load existing reviews into the loop ---- */
+  /* ---- load existing reviews ---- */
   fetch('/api/reviews')
     .then(function(r){ return r.json(); })
     .then(function(data){
       if(data && data.ok && Array.isArray(data.reviews) && data.reviews.length){
-        addCards(data.reviews.map(cardHTML).join(''), false);
+        data.reviews.forEach(function(r){ items.push(r); });
+        render();
       }
     })
     .catch(function(){});
@@ -65,7 +72,7 @@
   const submit = form.querySelector('button[type="submit"]');
   const MSG = {
     sending: { en:'Posting…', sq:'Duke postuar…' },
-    ok: { en:'Thanks! Your review was sent and will appear once we approve it.', sq:'Faleminderit! Vlerësimi u dërgua dhe do të shfaqet pasi ta miratojmë.' },
+    ok: { en:'Thank you for your feedback!', sq:'Faleminderit për vlerësimin tuaj!' },
     fail: { en:'Could not post your review. Please try again.', sq:'Vlerësimi nuk u postua. Ju lutemi provoni sërish.' },
   };
   const FIELD_MSG = {
@@ -117,7 +124,9 @@
       });
       const body = await res.json().catch(function(){ return {}; });
       if(res.ok && body.ok){
-        // review is stored as pending; it joins the loop once approved
+        // 4★+ reviews auto-publish: show the new card right away (once, at the front).
+        // Lower ratings are held for moderation and simply don't appear.
+        if(body.published && body.review){ addReview(body.review, true); }
         say('ok', 'ok');
         form.reset();
         setRating(5);

@@ -22,6 +22,7 @@ const router = express.Router();
 
 const LIMITS = { name: 80, role: 80, text: 600 };
 const MAX_PUBLIC = 60;
+const MIN_PUBLIC_RATING = 4; // reviews below this are stored but never shown publicly
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'ijt-dev-admin';
 if (!process.env.ADMIN_TOKEN) {
   console.warn('[reviews] ADMIN_TOKEN not set — using insecure dev token "ijt-dev-admin". Set ADMIN_TOKEN in production.');
@@ -64,7 +65,11 @@ function requireAdmin(req, res, next) {
 router.get('/', async (req, res, next) => {
   try {
     const all = await readReviews();
-    const reviews = all.filter((r) => r.approved).reverse().slice(0, MAX_PUBLIC).map(toPublic);
+    const reviews = all
+      .filter((r) => r.approved && r.rating >= MIN_PUBLIC_RATING)
+      .reverse()
+      .slice(0, MAX_PUBLIC)
+      .map(toPublic);
     res.json({ ok: true, reviews });
   } catch (err) {
     next(err);
@@ -78,16 +83,24 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({ ok: false, error: 'Validation failed.', fields });
     }
 
-    await saveReview({
+    const now = new Date().toISOString();
+    const autoPublish = data.rating >= MIN_PUBLIC_RATING; // 4★+ go live immediately, no approval
+    const saved = await saveReview({
       ...data,
-      approved: false,
+      approved: autoPublish,
+      approvedAt: autoPublish ? now : null,
       ip: req.ip,
       userAgent: req.get('user-agent') || '',
-      createdAt: new Date().toISOString(),
+      createdAt: now,
     });
 
-    console.log(`New pending review from ${data.name} (${data.rating}★)`);
-    return res.status(201).json({ ok: true, pending: true, message: 'Review received and awaiting approval.' });
+    console.log(`New review from ${data.name} (${data.rating}★) — ${autoPublish ? 'published' : 'held for moderation'}`);
+    return res.status(201).json({
+      ok: true,
+      published: autoPublish,
+      review: autoPublish ? toPublic(saved) : undefined,
+      message: autoPublish ? 'Review published.' : 'Review received and awaiting approval.',
+    });
   } catch (err) {
     next(err);
   }

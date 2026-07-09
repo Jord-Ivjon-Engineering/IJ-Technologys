@@ -3,8 +3,10 @@
 /**
  * IJ Technologys — backend server.
  * Serves the static frontend and exposes a small JSON API
- * (currently the contact form endpoint).
+ * (contact form + client reviews, both backed by Supabase).
  */
+require('dotenv').config();
+
 const path = require('path');
 const express = require('express');
 

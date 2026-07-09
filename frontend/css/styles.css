@@ -404,6 +404,8 @@ header.scrolled{
 .marquee-wrap{overflow:hidden}
 .marquee{display:flex;gap:22px;width:max-content;animation:slide 42s linear infinite;padding:10px 0}
 .marquee:hover{animation-play-state:paused}
+/* Static mode: each review shown once, centered, wrapping — no looping/repeat. */
+.marquee.is-static{width:auto;max-width:1120px;margin:0 auto;flex-wrap:wrap;justify-content:center;animation:none}
 .tcard{
   width:340px;flex-shrink:0;padding:26px;border-radius:var(--r);border:1px solid var(--stroke);
   background:var(--card-bg);box-shadow:var(--shadow-sm);

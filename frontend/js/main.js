@@ -84,7 +84,8 @@ document.querySelectorAll('[data-count]').forEach(el=> counterIO.observe(el));
 
 function buildMarquees(){
   const lang = document.documentElement.lang === 'sq' ? 'sq' : 'en';
-  [['strip',36],['marquee',42]].forEach(([id,base])=>{
+  // Only the logo strip loops; client reviews are rendered once (no repeat) by reviews.js.
+  [['strip',36]].forEach(([id,base])=>{
     const el = document.getElementById(id);
     if(!el) return;
     // remember the original single sequence once
