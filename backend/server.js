@@ -9,9 +9,10 @@ const path = require('path');
 const express = require('express');
 
 const contactRouter = require('./routes/contact');
+const reviewsRouter = require('./routes/reviews');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
 
 /* ---- middleware ---- */
@@ -22,6 +23,7 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, service: 'ij-technologys', time: new Date().toISOString() });
 });
 app.use('/api/contact', contactRouter);
+app.use('/api/reviews', reviewsRouter);
 
 /* ---- static frontend ---- */
 app.use(express.static(FRONTEND_DIR));

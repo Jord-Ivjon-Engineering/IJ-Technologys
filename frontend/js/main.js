@@ -83,16 +83,38 @@ const counterIO = new IntersectionObserver(es=>{
 document.querySelectorAll('[data-count]').forEach(el=> counterIO.observe(el));
 
 function buildMarquees(){
-  ['strip','marquee'].forEach(id=>{
+  const lang = document.documentElement.lang === 'sq' ? 'sq' : 'en';
+  [['strip',36],['marquee',42]].forEach(([id,base])=>{
     const el = document.getElementById(id);
     if(!el) return;
+    // remember the original single sequence once
     if(!el.dataset.orig) el.dataset.orig = el.innerHTML;
-    else el.innerHTML = el.dataset.orig;
-    el.dataset.orig = el.innerHTML;
-    el.innerHTML += el.innerHTML;
+    const unit = el.dataset.orig;
+    // repeat the sequence until one "half" comfortably exceeds the viewport,
+    // so translateX(-50%) always loops with no empty gap
+    const cw = el.parentElement ? el.parentElement.offsetWidth : window.innerWidth;
+    let half = unit, copies = 1;
+    el.innerHTML = half;
+    while(el.scrollWidth < cw + 120 && copies < 40){
+      half += unit; copies++;
+      el.innerHTML = half;
+    }
+    // two identical halves = seamless loop; keep px/sec constant across screens
+    el.innerHTML = half + half;
+    el.style.animationDuration = (base * copies) + 's';
+    // re-apply the active language to the freshly-built nodes
+    el.querySelectorAll('[data-en]').forEach(n=>{
+      const t = n.getAttribute('data-'+lang);
+      if(t) n.innerHTML = t;
+    });
   });
 }
 buildMarquees();
+let marqueeResizeT;
+window.addEventListener('resize', ()=>{
+  clearTimeout(marqueeResizeT);
+  marqueeResizeT = setTimeout(buildMarquees, 200);
+}, {passive:true});
 
 const io = new IntersectionObserver(es=>{
   es.forEach(e=>{
