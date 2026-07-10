@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex">
+<title>Log in — IJ Technologys</title>
+<script>
+(function(){
+  var mobile=window.matchMedia('(max-width: 1020px)').matches;
+  document.documentElement.setAttribute('data-display',mobile?'mobile':'desktop');
+  try{
+    var t=localStorage.getItem('ij-theme');
+    if(!t) t=mobile?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+  }catch(e){document.documentElement.setAttribute('data-theme',mobile?'light':'dark');}
+  document.documentElement.classList.add('js');
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/images/logo.png" type="image/png">
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="auth-page">
+<div class="vignette" aria-hidden="true"></div>
+
+<header id="header">
+  <nav class="nav" aria-label="Main">
+    <a class="logo" href="/"><img src="/images/logo.png" alt="IJ Technologys"><span>Technologys</span></a>
+    <div class="nav-right">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode">
+        <span class="icon-sun" aria-hidden="true">☀</span>
+        <span class="icon-moon" aria-hidden="true">☽</span>
+      </button>
+      <div class="toggle-group lang">
+        <button type="button" id="btn-sq">ALB</button>
+        <button type="button" id="btn-en" class="active">ENG</button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main class="auth-main">
+  <div class="auth-card reveal in">
+    <p class="section-label" data-en="Account access" data-sq="Qasja në llogari">Account access</p>
+    <h1 data-en="Sign in" data-sq="Hyr">Sign in</h1>
+    <p class="auth-lead" data-en="Admins open the CRM. Clients open their project dashboard." data-sq="Administratorët hapin CRM-n. Klientët hapin panelin e projektit.">Admins open the CRM. Clients open their project dashboard.</p>
+
+    <form class="contact-form auth-form" id="loginForm" novalidate>
+      <div class="field" id="field-email">
+        <label for="login-email" data-en="Email" data-sq="Email">Email</label>
+        <input id="login-email" name="email" type="email" autocomplete="email" required
+               data-en="Your email" data-sq="Emaili yt" placeholder="Your email">
+        <span class="field-error" id="err-email" role="alert"></span>
+      </div>
+      <div class="field" id="field-password">
+        <label for="login-password" data-en="Password" data-sq="Fjalëkalimi">Password</label>
+        <input id="login-password" name="password" type="password" autocomplete="current-password" required
+               data-en="Your password" data-sq="Fjalëkalimi yt" placeholder="Your password">
+        <span class="field-error" id="err-password" role="alert"></span>
+      </div>
+      <button class="btn primary" type="submit" data-en="Sign in" data-sq="Hyr">Sign in</button>
+      <p class="form-status" id="loginStatus" role="status" aria-live="polite"></p>
+    </form>
+
+    <p class="auth-foot">
+      <a href="/" data-en="← Back to website" data-sq="← Kthehu te faqja">← Back to website</a>
+    </p>
+  </div>
+</main>
+
+<script type="module" src="/js/login.js"></script>
+</body>
+</html>

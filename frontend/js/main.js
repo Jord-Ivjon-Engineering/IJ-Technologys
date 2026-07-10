@@ -206,11 +206,24 @@ updateNavActive();
 const wrap = document.getElementById('projects');
 const ring = document.getElementById('ring');
 const hint = document.getElementById('scrollHint');
-const CARD_SLOTS = document.querySelectorAll('.pcard').length || 6;
-const CARD_STEP = 360 / CARD_SLOTS;
-const RING_TRAVEL = (CARD_SLOTS - 1) * CARD_STEP;
+let cardSlots = 0;
+let cardStep = 360;
+let ringTravel = 0;
 let targetRot = 0, currentRot = 0, ticking = false;
 let ringGlobeSync = 0;
+
+function syncRingLayout() {
+  const cards = document.querySelectorAll('.pcard');
+  cardSlots = cards.length;
+  if (!cardSlots) return;
+  cardStep = 360 / cardSlots;
+  ringTravel = (cardSlots - 1) * cardStep;
+  cards.forEach((card, i) => card.style.setProperty('--i', String(i)));
+  updateRing();
+  updateCardTransforms(currentRot);
+  if (typeof setRadius === 'function') setRadius();
+}
+window.ijSyncRing = syncRingLayout;
 
 function easeInOutCubic(t){
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -221,7 +234,7 @@ function updateRing(){
   const total = Math.max(1, wrap.offsetHeight - window.innerHeight);
   const progress = Math.min(1, Math.max(0, -rect.top / total));
   const eased = easeInOutCubic(progress);
-  targetRot = -eased * RING_TRAVEL;
+  targetRot = -eased * ringTravel;
   hint.style.opacity = (progress > 0.03 && progress < 0.97) ? '0' : '1';
   ticking = false;
 }
@@ -230,7 +243,7 @@ function updateCardTransforms(rot){
   document.querySelectorAll('.pcard').forEach(card=>{
     const i = parseInt(getComputedStyle(card).getPropertyValue('--i'), 10) || 0;
     const radiusPx = parseFloat(getComputedStyle(card).getPropertyValue('--radius')) || 420;
-    const angle = i * CARD_STEP + rot;
+    const angle = i * cardStep + rot;
     const rad = angle * Math.PI / 180;
     const x = radiusPx * Math.sin(rad);
     const z = radiusPx * Math.cos(rad);
@@ -253,6 +266,7 @@ if(isDesktopDisplay()){
   window.addEventListener('scroll', ()=>{
     if(!ticking){ requestAnimationFrame(updateRing); ticking = true; }
   },{ passive:true });
+  syncRingLayout();
   updateRing();
   animateRing();
 
@@ -265,6 +279,7 @@ if(isDesktopDisplay()){
   setRadius();
   updateCardTransforms(0);
   window.addEventListener('resize', setRadius);
+  document.addEventListener('ij-cms-ready', syncRingLayout);
 }
 
 document.querySelector('.foot-call-mobile')?.addEventListener('click', ()=>{
@@ -690,6 +705,10 @@ function makeCodeTexture(w,h,fontSize,dense, cols, dimColor){
 })();
 
 initTheme();
+window.setLang = setLang;
+window.ijRefreshCounters = function(){
+  document.querySelectorAll('[data-count]').forEach(function(el){ counterIO.observe(el); });
+};
 try{
   if(localStorage.getItem('ij-lang') === 'sq') setLang('sq');
   else if(!localStorage.getItem('ij-lang') && isMobileDisplay() && navigator.language && navigator.language.toLowerCase().startsWith('sq')) setLang('sq');

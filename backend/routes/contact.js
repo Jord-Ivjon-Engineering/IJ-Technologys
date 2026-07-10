@@ -19,12 +19,13 @@ function validate(body) {
   const name = typeof body.name === 'string' ? body.name.trim() : '';
   const email = typeof body.email === 'string' ? body.email.trim() : '';
   const message = typeof body.message === 'string' ? body.message.trim() : '';
+  const pkg = typeof body.package === 'string' ? body.package.trim().slice(0, 40) : '';
 
   if (name.length < 2 || name.length > LIMITS.name) fields.push('name');
   if (!EMAIL_RE.test(email) || email.length > LIMITS.email) fields.push('email');
   if (message.length < 10 || message.length > LIMITS.message) fields.push('message');
 
-  return { fields, clean: { name, email, message } };
+  return { fields, clean: { name, email, message, package: pkg } };
 }
 
 router.post('/', async (req, res, next) => {

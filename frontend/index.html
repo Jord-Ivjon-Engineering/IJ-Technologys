@@ -43,6 +43,7 @@
       <li><a href="#contact" data-en="Contact" data-sq="Kontakt">Contact</a></li>
     </ul>
     <div class="nav-right">
+      <a class="nav-login" href="/login.html" data-en="Log in" data-sq="Hyr">Log in</a>
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode">
         <span class="icon-sun" aria-hidden="true">☀</span>
         <span class="icon-moon" aria-hidden="true">☽</span>
@@ -62,6 +63,7 @@
   <a href="#clients" data-en="Clients" data-sq="Klientët">Clients</a>
   <a href="#offers" data-en="Pricing" data-sq="Çmimet">Pricing</a>
   <a href="#contact" data-en="Contact" data-sq="Kontakt">Contact</a>
+  <a class="mobile-menu-login" href="/login.html" data-en="Log in" data-sq="Hyr">Log in</a>
   <div class="mobile-menu-tools">
     <button type="button" class="theme-toggle" id="themeToggleMenu" aria-label="Toggle light and dark mode">
       <span class="icon-sun" aria-hidden="true">☀</span>
@@ -79,48 +81,40 @@
 <section class="hero" id="about">
   <div class="container hero-grid">
     <div class="reveal in">
-      <p class="section-label" data-en="Web studio for local businesses" data-sq="Studio web për biznese lokale">Web studio for local businesses</p>
-      <h1 data-en="Websites and shops you can trust to launch on time." data-sq="Faqe dhe dyqane që mund t'i besosh për nisje në kohë.">Websites and shops you can trust to launch on time.</h1>
-      <p class="lead" data-en="We design and build websites, online shops and custom tools for shops, guesthouses and restaurants in the region. One team from first sketch to launch, with clear pricing and weekly progress."
-         data-sq="Ne projektojmë dhe ndërtojmë faqe interneti, dyqane online dhe mjete të personalizuara për dyqane, bujtina dhe restorante në rajon. Një ekip nga skica e parë deri te nisja, me çmime të qarta dhe progres çdo javë.">
-        We design and build websites, online shops and custom tools for shops, guesthouses and restaurants in the region. One team from first sketch to launch, with clear pricing and weekly progress.
-      </p>
+      <p class="section-label" data-cms="hero.label"></p>
+      <h1 data-cms="hero.title"></h1>
+      <p class="lead" data-cms="hero.lead"></p>
       <div class="cta-row">
-        <a class="btn primary" href="#contact" data-plan="Pro" data-en="Start with Pro →" data-sq="Nis me Pro →">Start with Pro →</a>
-        <a class="btn" href="#offers" data-en="See pricing" data-sq="Shiko çmimet">See pricing</a>
+        <a class="btn primary" href="#contact" data-cms="hero.ctaPrimary" data-plan="Pro"></a>
+        <a class="btn" href="#offers" data-cms="hero.ctaSecondary"></a>
       </div>
-      <div class="stats">
-        <div class="stat"><b data-count="48">48+</b><span data-en="projects launched" data-sq="projekte të nisura">projects launched</span></div>
-        <div class="stat"><b data-count="31">31+</b><span data-en="happy clients" data-sq="klientë të kënaqur">happy clients</span></div>
-        <div class="stat"><b data-count="6">6+</b><span data-en="countries reached" data-sq="vende të arritura">countries reached</span></div>
-      </div>
+      <div class="stats" data-cms="stats"></div>
     </div>
     <div class="hero3d reveal in d1" id="hero3d">
       <canvas id="cardCanvas"></canvas>
       <div class="card-overlay" id="cardOverlay" aria-hidden="true">
         <div class="co-mark"><img src="/images/logo.png" alt=""></div>
-        <p class="card-title" data-en="Built to work on every screen." data-sq="Ndërtuar për çdo ekran.">Built to work on every screen.</p>
-        <p class="card-meta" data-en="Design, code and launch in one place." data-sq="Dizajn, kod dhe nisje në një vend.">Design, code and launch in one place.</p>
+        <p class="card-title" data-cms="hero.cardTitle"></p>
+        <p class="card-meta" data-cms="hero.cardMeta"></p>
       </div>
-      <span class="hint hint-desktop" data-en="Move your mouse to explore" data-sq="Lëviz mausin për të eksploruar">Move your mouse to explore</span>
-      <span class="hint hint-mobile" data-en="Built for phones and desktops alike." data-sq="Ndërtuar për telefon dhe desktop njësoj.">Built for phones and desktops alike.</span>
+      <span class="hint hint-desktop"></span>
+      <span class="hint hint-mobile"></span>
     </div>
   </div>
 </section>
 
 <div class="strip" aria-hidden="true">
   <div class="strip-track" id="strip">
-    <span data-en="Websites <i>◆</i> Online shops <i>◆</i> Web apps <i>◆</i> Booking systems <i>◆</i> Branding <i>◆</i> Hosting &amp; care <i>◆</i> SEO <i>◆</i> Animations <i>◆</i>"
-          data-sq="Faqe interneti <i>◆</i> Dyqane online <i>◆</i> Aplikacione web <i>◆</i> Sisteme rezervimi <i>◆</i> Branding <i>◆</i> Hostim &amp; mirëmbajtje <i>◆</i> SEO <i>◆</i> Animacione <i>◆</i>">Websites <i>◆</i> Online shops <i>◆</i> Web apps <i>◆</i> Booking systems <i>◆</i> Branding <i>◆</i> Hosting &amp; care <i>◆</i> SEO <i>◆</i> Animations <i>◆</i></span>
+    <span data-cms="sections.stripText"></span>
   </div>
 </div>
 
 <section class="projects-wrap" id="projects">
   <div class="projects-stage">
     <div class="sec-head center">
-      <h2 data-en="Recent work from the region" data-sq="Punë e fundit nga rajoni">Recent work from the <span class="accent">region</span></h2>
-      <p class="sub sub-desktop" data-en="Scroll to rotate the globe and browse projects we built for shops, stays and local services." data-sq="Lëviz poshtë për të rrotulluar globin dhe shfletuar projektet që kemi ndërtuar për dyqane, bujtina dhe shërbime lokale.">Scroll to rotate the globe and browse projects we built for shops, stays and local services.</p>
-      <p class="sub sub-mobile" data-en="Projects we built for shops, guesthouses and local services in the region." data-sq="Projekte që kemi ndërtuar për dyqane, bujtina dhe shërbime lokale në rajon.">Projects we built for shops, guesthouses and local services in the region.</p>
+      <h2 data-cms="sections.projectsHeadline"></h2>
+      <p class="sub sub-desktop" data-cms="sections.projectsSub"></p>
+      <p class="sub sub-mobile" data-cms="sections.projectsSubMobile"></p>
     </div>
     <span class="scroll-hint" id="scrollHint">
       <span class="wheel"></span>
@@ -128,38 +122,7 @@
     </span>
     <div class="orbit-scene" id="orbitScene">
       <canvas id="globeCanvas" aria-hidden="true"></canvas>
-      <div class="ring" id="ring">
-        <article class="pcard" style="--i:0">
-          <div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&amp;fit=crop&amp;w=580&amp;h=360&amp;q=80" alt="Fresh produce at Buna Market online shop"></div>
-          <div class="body"><span class="tag" data-en="online shop" data-sq="dyqan online">online shop</span><h3>Buna Market</h3>
-          <p data-en="E-commerce with cart, card payments and delivery tracking for a local grocer." data-sq="E-commerce me shportë, pagesa me kartë dhe gjurmim dërgesash për një dyqan lokal.">E-commerce with cart, card payments and delivery tracking for a local grocer.</p></div>
-        </article>
-        <article class="pcard" style="--i:1">
-          <div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&amp;fit=crop&amp;w=580&amp;h=360&amp;q=80" alt="Alpet Stay guesthouse booking website"></div>
-          <div class="body"><span class="tag" data-en="booking system" data-sq="sistem rezervimesh">booking system</span><h3>Alpet Stay</h3>
-          <p data-en="Guesthouse booking with live calendar and instant confirmation, mobile-first." data-sq="Rezervime bujtine me kalendar live dhe konfirmim të çastit, së pari për celular.">Guesthouse booking with live calendar and instant confirmation, mobile-first.</p></div>
-        </article>
-        <article class="pcard" style="--i:2">
-          <div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&amp;fit=crop&amp;w=580&amp;h=360&amp;q=80" alt="Tavolina 12 restaurant website"></div>
-          <div class="body"><span class="tag" data-en="restaurant" data-sq="restorant">restaurant</span><h3>Tavolina 12</h3>
-          <p data-en="Digital menu, table reservations and a gallery that shows the atmosphere." data-sq="Menu dixhitale, rezervime tavoline dhe galeri që tregon atmosferën.">Digital menu, table reservations and a gallery that shows the atmosphere.</p></div>
-        </article>
-        <article class="pcard" style="--i:3">
-          <div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&amp;fit=crop&amp;w=580&amp;h=360&amp;q=80" alt="Nord Logistics business portal"></div>
-          <div class="body"><span class="tag" data-en="business portal" data-sq="portal biznesi">business portal</span><h3>Nord Logistics</h3>
-          <p data-en="Fleet dashboard and client area, bilingual and ready on phones." data-sq="Panel flote dhe zonë klientësh, dygjuhëshe dhe gati në telefon.">Fleet dashboard and client area, bilingual and ready on phones.</p></div>
-        </article>
-        <article class="pcard" style="--i:4">
-          <div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?auto=format&amp;fit=crop&amp;w=580&amp;h=360&amp;q=80" alt="Studio Drin photography portfolio"></div>
-          <div class="body"><span class="tag" data-en="portfolio" data-sq="portofol">portfolio</span><h3>Studio Drin</h3>
-          <p data-en="Scroll-led portfolio that puts the photographer's work front and center." data-sq="Portofol me scroll që e vendos punën e fotografit në qendër.">Scroll-led portfolio that puts the photographer's work front and center.</p></div>
-        </article>
-        <article class="pcard" style="--i:5">
-          <div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&amp;fit=crop&amp;w=580&amp;h=360&amp;q=80" alt="Faturo invoicing web app"></div>
-          <div class="body"><span class="tag" data-en="web app" data-sq="aplikacion web">web app</span><h3>Faturo</h3>
-          <p data-en="Invoicing for small businesses: create, send and track in seconds." data-sq="Faturim për biznese të vogla: krijo, dërgo dhe gjurmo në sekonda.">Invoicing for small businesses: create, send and track in seconds.</p></div>
-        </article>
-      </div>
+      <div class="ring" id="ring"></div>
     </div>
   </div>
 </section>
@@ -181,16 +144,9 @@
       <div class="laptop-base"><span class="laptop-notch"></span></div>
     </div>
     <div class="work-copy reveal d1">
-      <h2 data-en="One team from sketch to launch." data-sq="Një ekip nga skica deri te nisja.">One team from sketch to launch.</h2>
-      <p data-en="Every project moves through design, build, testing on real devices and a launch we handle together. You see progress every week, not a surprise at the end."
-         data-sq="Çdo projekt kalon nëpër dizajn, ndërtim, testim në pajisje reale dhe një nisje që e bëjmë bashkë. E sheh progresin çdo javë, jo një surprizë në fund.">
-        Every project moves through design, build, testing on real devices and a launch we handle together. You see progress every week, not a surprise at the end.
-      </p>
-      <ul class="feature-list">
-        <li><span class="ic"><svg viewBox="0 0 24 24"><path d="M13 2 L4 14 h6 l-1 8 9-12 h-6 z"/></svg></span><span data-en="Design, code, hosting and maintenance in one place." data-sq="Dizajn, kod, hostim dhe mirëmbajtje në një vend.">Design, code, hosting and maintenance in one place.</span></li>
-        <li><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12 h18 M12 3 c3 3 3 15 0 18 c-3 -3 -3 -15 0 -18"/></svg></span><span data-en="Albanian and English by default. More languages when you need them." data-sq="Shqip dhe anglisht si standard. Më shumë gjuhë kur të nevojiten.">Albanian and English by default. More languages when you need them.</span></li>
-        <li><span class="ic"><svg viewBox="0 0 24 24"><path d="M2 12 s3.5-6 10-6 10 6 10 6 -3.5 6-10 6 -10-6-10-6 z"/><circle cx="12" cy="12" r="2.6"/></svg></span><span data-en="Weekly check-ins so you always know where things stand." data-sq="Takime javore që të dish gjithmonë ku ndodhemi.">Weekly check-ins so you always know where things stand.</span></li>
-      </ul>
+      <h2 data-cms="sections.workTitle"></h2>
+      <p data-cms="sections.workBody"></p>
+      <ul class="feature-list" id="workFeatures"></ul>
     </div>
   </div>
 </section>
@@ -208,64 +164,22 @@
 <section class="offers" id="offers">
   <div class="container">
     <div class="sec-head center reveal">
-      <h2 data-en="Clear packages, clear prices" data-sq="Paketa të qarta, çmime të qarta">Clear packages, clear prices</h2>
-      <p class="sub" data-en="Every plan includes responsive design and support after launch. Pick a starting point and we tailor the rest." data-sq="Çdo plan përfshin dizajn responsiv dhe suport pas nisjes. Zgjidh një pikënisje dhe pjesën tjetër e përshtatim ne.">Every plan includes responsive design and support after launch. Pick a starting point and we tailor the rest.</p>
+      <h2 data-cms="sections.pricingTitle"></h2>
+      <p class="sub" data-cms="sections.pricingSub"></p>
     </div>
-    <div class="offer-grid">
-      <div class="plan reveal">
-        <h3>Basic</h3>
-        <div class="price">€290</div>
-        <div class="per" data-en="one-time · ~2 weeks" data-sq="pagesë e vetme · ~2 javë">one-time · ~2 weeks</div>
-        <ul>
-          <li data-en="One-page website" data-sq="Faqe interneti një-faqëshe">One-page website</li>
-          <li data-en="Mobile-first and fast loading" data-sq="Së pari për celular dhe e shpejtë">Mobile-first and fast loading</li>
-          <li data-en="Contact form, map and socials" data-sq="Formular kontakti, hartë dhe rrjete sociale">Contact form, map and socials</li>
-          <li data-en="1 language" data-sq="1 gjuhë">1 language</li>
-        </ul>
-        <a class="btn plan-cta" href="#contact" data-plan="Basic" data-en="Start with Basic" data-sq="Nis me Basic">Start with Basic</a>
-      </div>
-      <div class="plan pro reveal d1">
-        <span class="flag" data-en="Most chosen" data-sq="Më i zgjedhuri">Most chosen</span>
-        <h3>Pro</h3>
-        <div class="price">€690</div>
-        <div class="per" data-en="one-time · ~4 weeks" data-sq="pagesë e vetme · ~4 javë">one-time · ~4 weeks</div>
-        <ul>
-          <li data-en="Multi-page site" data-sq="Faqe me shumë seksione">Multi-page site</li>
-          <li data-en="Two languages (ALB / ENG)" data-sq="Dy gjuhë (SHQ / ENG)">Two languages (ALB / ENG)</li>
-          <li data-en="Booking or product catalogue" data-sq="Rezervime ose katalog produktesh">Booking or product catalogue</li>
-          <li data-en="Basic SEO and Google setup" data-sq="SEO bazë dhe konfigurim Google">Basic SEO and Google setup</li>
-          <li data-en="1 year hosting included" data-sq="1 vit hostim i përfshirë">1 year hosting included</li>
-        </ul>
-        <a class="btn primary plan-cta" href="#contact" data-plan="Pro" data-en="Go Pro" data-sq="Kalo në Pro">Go Pro</a>
-      </div>
-      <div class="plan reveal d2">
-        <h3>Premium</h3>
-        <div class="price" data-en="From €1,490" data-sq="Nga €1.490">From €1,490</div>
-        <div class="per" data-en="scope and timeline tailored" data-sq="përmbajtje dhe afate sipas nevojës">scope and timeline tailored</div>
-        <ul>
-          <li data-en="Online shop or custom web app" data-sq="Dyqan online ose aplikacion i personalizuar">Online shop or custom web app</li>
-          <li data-en="Payments, accounts and dashboards" data-sq="Pagesa, llogari dhe panele">Payments, accounts and dashboards</li>
-          <li data-en="Unlimited languages" data-sq="Gjuhë pa kufi">Unlimited languages</li>
-          <li data-en="Priority support and maintenance" data-sq="Suport me përparësi dhe mirëmbajtje">Priority support and maintenance</li>
-        </ul>
-        <a class="btn plan-cta" href="#contact" data-plan="Premium" data-en="Talk to us" data-sq="Fol me ne">Talk to us</a>
-      </div>
-    </div>
-    <p class="pricing-note reveal" data-en="Prices are one-time project fees. Hosting renewal after the first year is quoted separately. VAT applied where required." data-sq="Çmimet janë tarifa projekti një herë. Rinovimi i hostimit pas vitit të parë kuotohet veçmas. TVSH aplikohet ku kërkohet.">Prices are one-time project fees. Hosting renewal after the first year is quoted separately. VAT applied where required.</p>
+    <div class="offer-grid" data-cms="pricing"></div>
+    <p class="pricing-note reveal" data-cms="pricing.note"></p>
   </div>
 </section>
 
 <section class="suit">
   <div class="container">
     <div class="suit-inner reveal">
-      <div class="suit-img"><img src="https://images.unsplash.com/photo-1558171813-4c088754af8f?auto=format&amp;fit=crop&amp;w=900&amp;h=900&amp;q=80" alt="Tailor measuring fabric for a custom fit"></div>
+      <div class="suit-img"><img src="" alt=""></div>
       <div class="suit-copy">
-        <h2 data-en="Tailored to your business, not a template." data-sq="E përshtatur për biznesin tënd, jo një shabllon.">Tailored to your business, not a template.</h2>
-        <p data-en="We take your colours, voice and goals, then build something that fits how you actually work. No two sites leave our studio looking the same."
-           data-sq="Marrim ngjyrat, zërin dhe qëllimet e tua, pastaj ndërtojmë diçka që i përshtatet mënyrës si punon realisht. Asnjë faqe nuk del nga studioja jonë e njëjtë.">
-          We take your colours, voice and goals, then build something that fits how you actually work. No two sites leave our studio looking the same.
-        </p>
-        <a class="btn primary plan-cta" href="#contact" data-plan="" data-en="Book a free call" data-sq="Rezervo një telefonatë falas">Book a free call</a>
+        <h2 data-cms="sections.suitTitle"></h2>
+        <p data-cms="sections.suitBody"></p>
+        <a class="btn primary plan-cta" href="#contact" data-plan=""></a>
       </div>
     </div>
   </div>
@@ -275,14 +189,10 @@
   <div class="container">
     <div class="contact-inner">
       <div class="sec-head center reveal">
-        <h2 data-en="Tell us about your project" data-sq="Na trego për projektin tënd">Tell us about your project</h2>
-        <p class="sub" data-en="We reply within one business day. Your message goes straight to our inbox." data-sq="Të kthehemi brenda një dite pune. Mesazhi yt shkon drejt te ne.">We reply within one business day. Your message goes straight to our inbox.</p>
+        <h2 data-cms="sections.contactTitle"></h2>
+        <p class="sub" data-cms="sections.contactSub"></p>
       </div>
-      <div class="contact-steps reveal">
-        <span data-en="1. Send details" data-sq="1. Dërgo detajet">1. Send details</span>
-        <span data-en="2. We reply with next steps" data-sq="2. Përgjigjemi me hapat">2. We reply with next steps</span>
-        <span data-en="3. Start when you're ready" data-sq="3. Nis kur të jesh gati">3. Start when you're ready</span>
-      </div>
+      <div class="contact-steps reveal" id="contactSteps"></div>
       <form class="contact-form reveal d1" id="contactForm" novalidate>
         <div class="field row">
           <div class="field" id="field-name">
@@ -301,9 +211,6 @@
           <label for="cf-package" data-en="Package" data-sq="Paketa">Package</label>
           <select id="cf-package" name="package">
             <option value="" data-en="Not sure yet" data-sq="Ende nuk jam i sigurt">Not sure yet</option>
-            <option value="Basic">Basic (€290)</option>
-            <option value="Pro">Pro (€690)</option>
-            <option value="Premium">Premium (custom)</option>
           </select>
         </div>
         <div class="field" id="field-message">
@@ -324,8 +231,8 @@
   <div class="container">
     <div class="review-inner">
       <div class="sec-head center reveal">
-        <h2 data-en="Leave a review" data-sq="Lër një vlerësim">Leave a review</h2>
-        <p class="sub" data-en="Worked with us? Share a few words — your review joins the clients above." data-sq="Ke punuar me ne? Ndaj disa fjalë — vlerësimi yt bashkohet me klientët më lart.">Worked with us? Share a few words — your review joins the clients above.</p>
+        <h2 data-cms="sections.reviewTitle"></h2>
+        <p class="sub" data-cms="sections.reviewSub"></p>
       </div>
       <form class="contact-form reveal d1" id="reviewForm" novalidate>
         <div class="field row">
@@ -339,6 +246,7 @@
             <label for="rf-role" data-en="Business (optional)" data-sq="Biznesi (opsionale)">Business (optional)</label>
             <input id="rf-role" name="role" type="text" autocomplete="organization"
                    data-en="e.g. Buna Market" data-sq="p.sh. Buna Market" placeholder="e.g. Buna Market">
+            <span class="field-error" id="rerr-role" role="alert"></span>
           </div>
         </div>
         <div class="field" id="rfield-rating">
@@ -376,7 +284,7 @@
     <div class="foot-grid">
       <div>
         <a class="logo" href="#top"><img src="/images/logo.png" alt="IJ Technologys"><span>Technologys</span></a>
-        <p data-en="A web studio building websites, shops and digital tools for businesses across the region." data-sq="Një studio web që ndërton faqe, dyqane dhe mjete dixhitale për biznese në rajon.">A web studio building websites, shops and digital tools for businesses across the region.</p>
+        <p data-cms="footer.tagline"></p>
       </div>
       <div class="foot-col">
         <h3>Instagram</h3>
@@ -388,17 +296,18 @@
       </div>
       <div class="foot-col">
         <h3 data-en="Phone" data-sq="Telefon">Phone</h3>
-        <a class="foot-call-desktop" href="mailto:hello@ijtechnologys.com?subject=Call%20request"><span class="ic" aria-hidden="true">✆</span><span data-en="Request a call" data-sq="Kërko një telefonatë">Request a call</span></a>
-        <a class="foot-call-mobile" href="#contact" data-call-request="1"><span class="ic" aria-hidden="true">✆</span><span data-en="Request a call" data-sq="Kërko një telefonatë">Request a call</span></a>
+        <a class="foot-call-desktop" href="mailto:hello@ijtechnologys.com?subject=Call%20request"><span class="ic" aria-hidden="true">✆</span><span data-cms="footer.requestCall"></span></a>
+        <a class="foot-call-mobile" href="#contact" data-call-request="1"><span class="ic" aria-hidden="true">✆</span><span data-cms="footer.requestCall"></span></a>
       </div>
     </div>
     <div class="foot-note">
-      <span data-en="© 2026 IJ Technologys. All rights reserved." data-sq="© 2026 IJ Technologys. Të gjitha të drejtat e rezervuara.">© 2026 IJ Technologys. All rights reserved.</span>
-      <span data-en="Designed and built by us." data-sq="Dizenjuar dhe ndërtuar nga ne.">Designed and built by us.</span>
+      <span data-cms="footer.copyright"></span>
+      <span data-cms="footer.credit"></span>
     </div>
   </div>
 </footer>
 
+<script src="/js/content.js"></script>
 <script src="/js/main.js"></script>
 <script src="/js/contact.js"></script>
 <script src="/js/reviews.js"></script>

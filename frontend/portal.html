@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex">
+<title>Client portal — IJ Technologys</title>
+<script>
+(function(){
+  var mobile=window.matchMedia('(max-width: 1020px)').matches;
+  document.documentElement.setAttribute('data-display',mobile?'mobile':'desktop');
+  try{
+    var t=localStorage.getItem('ij-theme');
+    if(!t) t=mobile?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);
+  }catch(e){document.documentElement.setAttribute('data-theme',mobile?'light':'dark');}
+  document.documentElement.classList.add('js');
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/images/logo.png" type="image/png">
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="auth-page">
+<div class="vignette" aria-hidden="true"></div>
+
+<header id="header">
+  <nav class="nav" aria-label="Main">
+    <a class="logo" href="/"><img src="/images/logo.png" alt="IJ Technologys"><span>Technologys</span></a>
+    <div class="nav-right">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode">
+        <span class="icon-sun" aria-hidden="true">☀</span>
+        <span class="icon-moon" aria-hidden="true">☽</span>
+      </button>
+      <div class="toggle-group lang">
+        <button type="button" id="btn-sq">ALB</button>
+        <button type="button" id="btn-en" class="active">ENG</button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main class="auth-main">
+  <div class="auth-card reveal in" id="portalCard">
+    <p class="section-label" data-en="Client portal" data-sq="Portali i klientit">Client portal</p>
+    <h1 id="portalGreeting" data-en="Welcome" data-sq="Mirë se vini">Welcome</h1>
+    <p class="auth-lead" data-en="Your project dashboard is being designed. You will soon see progress, files and messages here." data-sq="Paneli i projektit tuaj po dizajnohet. Së shpejti do të shihni progresin, skedarët dhe mesazhet këtu.">Your project dashboard is being designed. You will soon see progress, files and messages here.</p>
+    <div class="auth-portal-placeholder" aria-hidden="true">
+      <span data-en="Dashboard coming soon" data-sq="Paneli së shpejti">Dashboard coming soon</span>
+    </div>
+    <button type="button" class="btn" id="portalLogout" data-en="Log out" data-sq="Dil">Log out</button>
+    <p class="auth-foot">
+      <a href="/" data-en="← Back to website" data-sq="← Kthehu te faqja">← Back to website</a>
+    </p>
+  </div>
+</main>
+
+<script type="module" src="/js/portal.js"></script>
+</body>
+</html>

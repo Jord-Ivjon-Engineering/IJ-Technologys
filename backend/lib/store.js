@@ -53,21 +53,14 @@ async function saveSubmission(item) {
       name: item.name,
       email: item.email,
       message: item.message,
+      package: item.package || '',
+      status: 'new',
       ip: item.ip,
       user_agent: item.userAgent,
       received_at: item.receivedAt,
     })
     .select()
     .single();
-  if (error) throw error;
-  return data;
-}
-
-async function readAll() {
-  const { data, error } = await supabase
-    .from('contact_submissions')
-    .select('*')
-    .order('received_at', { ascending: true });
   if (error) throw error;
   return data;
 }
@@ -115,4 +108,4 @@ async function deleteReview(id) {
   return Boolean(data); // false when no row matched
 }
 
-module.exports = { saveSubmission, readAll, saveReview, readReviews, updateReview, deleteReview };
+module.exports = { saveSubmission, saveReview, readReviews, updateReview, deleteReview };

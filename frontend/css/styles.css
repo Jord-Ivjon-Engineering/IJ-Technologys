@@ -146,6 +146,12 @@ header.scrolled{
   background:var(--primary);border-radius:2px;
 }
 .nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-login{
+  text-decoration:none;font-size:.88rem;font-weight:600;color:var(--muted);
+  padding:8px 14px;border:1px solid var(--stroke);border-radius:10px;white-space:nowrap;
+  transition:color .25s var(--ease),border-color .25s var(--ease),background .25s var(--ease);
+}
+.nav-login:hover{color:var(--text);border-color:var(--primary);background:var(--surface)}
 .toggle-group{display:flex;border:1px solid var(--stroke);border-radius:99px;overflow:hidden;background:var(--surface)}
 .toggle-group button{
   font-family:var(--body);font-size:.72rem;font-weight:600;letter-spacing:.04em;
@@ -537,6 +543,7 @@ header.scrolled{
 .contact-form{margin-top:32px;display:grid;gap:16px}
 .field{display:grid;gap:6px;text-align:left}
 .field.row{grid-template-columns:1fr 1fr;gap:16px}
+.field.row > .field label{min-height:2.5em}
 .field label{font-size:.78rem;font-weight:600;color:var(--muted)}
 .field input,.field textarea,.field select{
   font-family:var(--body);font-size:.95rem;color:var(--text);
@@ -626,7 +633,8 @@ footer{border-top:1px solid var(--stroke);background:var(--bg-elev);padding:56px
   html.js .reveal:not(.in){opacity:1;transform:none}
 }
 
-.hint-mobile,.sub-mobile,.foot-call-mobile,.mobile-menu-tools{display:none}
+.hint-mobile,.sub-mobile,.mobile-menu-tools{display:none}
+.foot-col .foot-call-mobile{display:none}
 
 [data-display="mobile"]{
   --canvas-display:none;
@@ -647,10 +655,10 @@ footer{border-top:1px solid var(--stroke);background:var(--bg-elev);padding:56px
 [data-display="mobile"] #globeCanvas{display:none}
 [data-display="mobile"] .hint-desktop,
 [data-display="mobile"] .sub-desktop,
-[data-display="mobile"] .foot-call-desktop{display:none}
+[data-display="mobile"] .foot-col .foot-call-desktop{display:none}
 [data-display="mobile"] .hint-mobile,
 [data-display="mobile"] .sub-mobile,
-[data-display="mobile"] .foot-call-mobile{display:flex}
+[data-display="mobile"] .foot-col .foot-call-mobile{display:flex}
 [data-display="mobile"] .sub-mobile{display:block;margin-left:auto;margin-right:auto}
 [data-display="mobile"] .nav{padding-top:max(14px,env(safe-area-inset-top));padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}
 [data-display="mobile"] .hero3d{height:220px;background:var(--surface-strong)}
@@ -671,3 +679,36 @@ footer{border-top:1px solid var(--stroke);background:var(--bg-elev);padding:56px
 [data-display="mobile"] .desk-frame,[data-display="mobile"] .laptop{display:none}
 [data-display="mobile"] .strip-track,[data-display="mobile"] .marquee{animation-play-state:paused}
 [data-display="mobile"] .plan .flag{font-size:.75rem}
+[data-display="mobile"] .mobile-menu-login{
+  font-size:1.05rem;font-weight:600;color:var(--primary);text-decoration:none;
+  padding:8px 0;margin-top:8px;
+}
+
+.auth-page{min-height:100vh}
+.auth-main{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:calc(var(--header-h) + 32px) clamp(20px,4vw,48px) 48px;
+}
+.auth-card{
+  width:100%;max-width:440px;padding:clamp(28px,5vw,40px);
+  background:var(--card-bg);border:1px solid var(--stroke);border-radius:calc(var(--r) + 4px);
+  box-shadow:var(--card-shadow);
+}
+.auth-card h1{font-size:clamp(1.75rem,4vw,2.25rem);margin:0 0 10px}
+.auth-lead{color:var(--muted);font-size:.98rem;margin-bottom:24px}
+.auth-form{margin-top:0}
+.auth-foot{margin-top:20px;font-size:.9rem}
+.auth-foot a{color:var(--primary);text-decoration:none;font-weight:600}
+.auth-foot a:hover{text-decoration:underline}
+.auth-portal-placeholder{
+  margin:24px 0;padding:28px 20px;border:1px dashed var(--stroke);border-radius:var(--r);
+  text-align:center;color:var(--muted);font-weight:600;background:var(--surface);
+}
+.form-status.error{color:#c0392b}
+
+.ij-cms-preview-banner{
+  position:fixed;top:0;left:0;right:0;z-index:9999;
+  padding:10px 16px;text-align:center;
+  background:#046e58;color:#fff;font:600 .85rem/1.3 var(--body);
+  box-shadow:0 2px 12px rgba(0,0,0,.12);
+}
