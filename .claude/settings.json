@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -f frontend/_lap_preview.html)",
+      "Bash(taskkill //F //IM msedge.exe //T)"
+    ]
+  }
+}

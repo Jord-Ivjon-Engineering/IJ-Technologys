@@ -176,6 +176,33 @@ function updateNavActive(){
 window.addEventListener('scroll', updateNavActive, {passive:true});
 updateNavActive();
 
+/* Scroll-driven laptop: the lid opens (rotateX -90deg -> 0) as the work
+   section rises into view. Desktop only; stays open for reduced motion. */
+(function laptopOpen(){
+  const laptop = document.querySelector('.laptop');
+  if(!laptop) return;
+  if(REDUCED){ laptop.style.setProperty('--lid','0deg'); return; }
+  const CLOSED = -84;
+  let ticking = false;
+  function update(){
+    ticking = false;
+    if(isMobileDisplay()){ laptop.style.setProperty('--lid','0deg'); return; }
+    const r = laptop.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    // Anchor on the bottom edge (where the closed laptop sits): fully closed the
+    // moment it enters at the viewport bottom, opening as it scrolls up over the
+    // next ~40% of the viewport.
+    const span = vh * 0.2;
+    let p = (vh - r.bottom) / span;
+    p = Math.max(0, Math.min(1, p));
+    laptop.style.setProperty('--lid', (CLOSED * (1 - p)).toFixed(2) + 'deg');
+  }
+  function onScroll(){ if(!ticking){ ticking = true; requestAnimationFrame(update); } }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', onScroll, {passive:true});
+  update();
+})();
+
 const wrap = document.getElementById('projects');
 const ring = document.getElementById('ring');
 const hint = document.getElementById('scrollHint');

@@ -166,148 +166,19 @@
 
 <section class="work" id="work">
   <div class="container work-grid">
-    <div class="desk-frame reveal" aria-hidden="true">
-      <svg viewBox="0 0 560 380">
-        <defs>
-          <linearGradient id="glowGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#00e8ff" stop-opacity=".28"/>
-            <stop offset="1" stop-color="#00ced1" stop-opacity=".12"/>
-          </linearGradient>
-          <linearGradient id="screenGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#1b2740"/>
-            <stop offset="1" stop-color="#0a0f1c"/>
-          </linearGradient>
-          <linearGradient id="reflGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#ffffff" stop-opacity=".10"/>
-            <stop offset=".55" stop-color="#ffffff" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-        <rect class="fl-floor" x="24" y="330" width="512" height="5" rx="2.5"/>
-        <ellipse class="fl-shadow" cx="264" cy="333" rx="216" ry="7"/>
-        <!-- desk: top slab, front edge (thickness), highlight, legs to the floor -->
-        <rect class="fl-desk" x="50" y="206" width="312" height="12" rx="4"/>
-        <rect class="fl-deskedge" x="50" y="218" width="312" height="10"/>
-        <rect class="fl-deskhi" x="55" y="207" width="302" height="2" rx="1"/>
-        <rect class="fl-desk2" x="70" y="228" width="8" height="102" rx="3"/>
-        <rect class="fl-desk2" x="334" y="228" width="8" height="102" rx="3"/>
-        <!-- monitor: bezel, gradient screen, glass reflection, code, stand + base, LED -->
-        <rect class="fl-frame" x="130" y="56" width="168" height="108" rx="13"/>
-        <rect x="139" y="65" width="150" height="90" rx="7" fill="url(#screenGrad)"/>
-        <rect class="screen-glow" x="139" y="65" width="150" height="90" rx="7" fill="url(#glowGrad)" opacity="0"/>
-        <polygon points="139,65 174,65 148,155 139,155" fill="url(#reflGrad)"/>
-        <line class="codeL k1" x1="152" y1="85" x2="230" y2="85"/>
-        <line class="codeL k2" x1="164" y1="103" x2="264" y2="103"/>
-        <line class="codeL k3" x1="164" y1="121" x2="240" y2="121"/>
-        <line class="codeL k4" x1="152" y1="139" x2="272" y2="139"/>
-        <circle class="fl-led" cx="289" cy="159" r="2"/>
-        <rect class="fl-frame" x="206" y="164" width="16" height="40"/>
-        <ellipse class="fl-frame" cx="214" cy="206" rx="38" ry="6"/>
-        <rect class="fl-sticky" x="266" y="70" width="18" height="18" rx="2"/>
-        <text class="sym s1" x="300" y="62">{ }</text>
-        <text class="sym s2" x="256" y="42">&lt;/&gt;</text>
-        <text class="sym s3" x="326" y="38">✦</text>
-        <!-- keyboard + mouse on the desk -->
-        <rect class="fl-keyboard" x="132" y="208" width="106" height="10" rx="3"/>
-        <rect class="fl-key" x="138" y="210" width="5" height="5" rx="1"/>
-        <rect class="fl-key" x="146" y="210" width="5" height="5" rx="1"/>
-        <rect class="fl-key" x="154" y="210" width="5" height="5" rx="1"/>
-        <rect class="fl-key" x="162" y="210" width="5" height="5" rx="1"/>
-        <rect class="fl-key" x="170" y="210" width="5" height="5" rx="1"/>
-        <rect class="fl-mousepad" x="248" y="208" width="34" height="20" rx="6"/>
-        <rect class="fl-mouse" x="258" y="211" width="12" height="16" rx="6"/>
-        <!-- floor-standing PC tower (the "server"): grounded and larger -->
-        <rect class="fl-tower" x="402" y="236" width="42" height="94" rx="5"/>
-        <rect class="fl-tower2" x="402" y="236" width="42" height="11" rx="5"/>
-        <circle class="fl-led" cx="412" cy="251" r="2.4"/>
-        <circle class="fl-led2" cx="423" cy="251" r="2.4"/>
-        <rect class="fl-vent" x="409" y="266" width="28" height="3" rx="1.5"/>
-        <rect class="fl-vent" x="409" y="274" width="28" height="3" rx="1.5"/>
-        <rect class="fl-vent" x="409" y="282" width="28" height="3" rx="1.5"/>
-        <rect class="fl-vent" x="409" y="290" width="28" height="3" rx="1.5"/>
-        <g id="walker2">
-          <g transform="translate(-38 -20) scale(1.12)">
-          <g class="wBounce">
-            <g class="wleg1" style="transform-box:fill-box;transform-origin:100% 0%">
-              <path class="limb fl-pants" d="M308 252 L298 306" stroke-width="13"/>
-              <rect class="fl-shoe" x="286" y="304" width="24" height="10" rx="5"/>
-            </g>
-            <g class="wleg2" style="transform-box:fill-box;transform-origin:0% 0%">
-              <path class="limb fl-pants2" d="M322 252 L332 306" stroke-width="13"/>
-              <rect class="fl-shoe" x="326" y="304" width="24" height="10" rx="5"/>
-            </g>
-            <rect class="fl-shirt" x="304" y="190" width="32" height="66" rx="14"/>
-            <rect class="fl-shirt2" x="304" y="232" width="32" height="12" rx="6"/>
-            <rect class="fl-shirt-hi" x="307" y="194" width="6" height="54" rx="3"/>
-            <g class="warm1" style="transform-box:fill-box;transform-origin:100% 0%">
-              <path class="limb fl-sleeve" d="M308 194 L280 242" stroke-width="10"/>
-              <circle class="fl-skin" cx="278" cy="244" r="6.5"/>
-            </g>
-            <g class="warm2" style="transform-box:fill-box;transform-origin:0% 0%">
-              <path class="limb fl-sleeve2" d="M322 194 L344 240" stroke-width="10"/>
-              <circle class="fl-skin" cx="346" cy="242" r="6.5"/>
-            </g>
-            <g class="wHead" style="transform-box:fill-box;transform-origin:50% 100%">
-              <circle class="fl-skin" cx="316" cy="146" r="22"/>
-              <ellipse class="fl-skin-hi" cx="307" cy="140" rx="6" ry="8"/>
-              <ellipse class="fl-skin-sh" cx="328" cy="149" rx="5" ry="11"/>
-              <path class="fl-hair" d="M294 142 a22 22 0 0 1 44 0 q-2 -10 -9 -12 q-13 -9 -27 0 q-6 2 -8 12 Z"/>
-              <path class="fl-hair" d="M335 122 q7 -5 11 2 q-5 1 -9 4 Z"/>
-              <g class="eyes">
-                <circle cx="304" cy="144" r="3" fill="#222226"/>
-                <circle cx="316" cy="143" r="3" fill="#222226"/>
-              </g>
-              <path d="M302 156 q7 6 15 2" stroke="#C4855C" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            </g>
-          </g>
-          </g>
-        </g>
-        <g id="sitter2">
-          <g transform="translate(-38 -16) scale(1.12)">
-          <g class="chairSquish" style="transform-box:fill-box;transform-origin:50% 100%">
-            <rect class="fl-chair" x="342" y="176" width="11" height="82" rx="5"/>
-            <rect class="fl-chair2" x="342" y="176" width="4" height="82" rx="2"/>
-            <rect class="fl-chair" x="286" y="254" width="72" height="14" rx="7"/>
-            <rect class="fl-chair" x="314" y="268" width="8" height="34" rx="4"/>
-            <path class="fl-chair-base" d="M296 304 L318 290 L340 304" stroke-width="8"/>
-            <circle class="fl-chair-wheel" cx="296" cy="306" r="5.5"/>
-            <circle class="fl-chair-wheel" cx="340" cy="306" r="5.5"/>
-          </g>
-          <g class="plop" style="transform-box:fill-box;transform-origin:50% 100%">
-            <path class="limb fl-pants" d="M306 248 L262 254 L262 306" stroke-width="14"/>
-            <rect class="fl-shoe" x="246" y="304" width="24" height="10" rx="5"/>
-            <path class="limb fl-pants2" d="M318 250 L318 272 L318 306" stroke-width="14"/>
-            <rect class="fl-shoe" x="306" y="304" width="24" height="10" rx="5"/>
-            <rect class="fl-skin" x="309" y="168" width="14" height="24" rx="6"/>
-            <rect class="fl-shirt" x="298" y="184" width="36" height="72" rx="15"/>
-            <rect class="fl-shirt2" x="298" y="232" width="36" height="14" rx="7"/>
-            <rect class="fl-shirt-hi" x="302" y="188" width="6" height="60" rx="3"/>
-            <g class="tArm2" style="transform-box:fill-box;transform-origin:90% 15%">
-              <path class="limb fl-sleeve2" d="M318 198 L322 216 L268 214" stroke-width="11"/>
-              <circle class="fl-skin" cx="264" cy="214" r="6.5"/>
-            </g>
-            <g class="tArm1" style="transform-box:fill-box;transform-origin:90% 15%">
-              <path class="limb fl-sleeve" d="M306 192 L312 214 L208 210" stroke-width="11"/>
-              <circle class="fl-skin" cx="204" cy="210" r="6.5"/>
-            </g>
-            <g class="headBob" style="transform-box:fill-box;transform-origin:50% 100%">
-              <circle class="fl-skin" cx="312" cy="142" r="22"/>
-              <ellipse class="fl-skin-hi" cx="303" cy="136" rx="6" ry="8"/>
-              <ellipse class="fl-skin-sh" cx="324" cy="145" rx="5" ry="12"/>
-              <path class="fl-hair" d="M290 138 a22 22 0 0 1 44 0 q-2 -10 -9 -12 q-13 -9 -27 0 q-6 2 -8 12 Z"/>
-              <path class="fl-hair" d="M331 118 q7 -5 11 2 q-5 1 -9 4 Z"/>
-              <path class="fl-headband" d="M287 134 a23 23 0 0 1 50 0" stroke-width="4"/>
-              <rect class="fl-earcup" x="283" y="132" width="9" height="15" rx="4.5"/>
-              <rect class="fl-earcup" x="332" y="132" width="9" height="15" rx="4.5"/>
-              <g class="eyes">
-                <circle cx="300" cy="140" r="3" fill="#222226"/>
-                <circle cx="312" cy="139" r="3" fill="#222226"/>
-              </g>
-              <path d="M298 152 q7 6 15 2" stroke="#C4855C" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            </g>
-          </g>
-          </g>
-        </g>
-      </svg>
+    <div class="laptop reveal" aria-hidden="true">
+      <div class="laptop-lid">
+        <div class="laptop-front">
+          <div class="laptop-screen">
+            <video class="desk-video" autoplay muted loop playsinline preload="metadata">
+              <source src="videos/coding-monitor.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+        <div class="laptop-shell"></div>
+        <div class="laptop-edge"></div>
+      </div>
+      <div class="laptop-base"><span class="laptop-notch"></span></div>
     </div>
     <div class="work-copy reveal d1">
       <h2 data-en="One team from sketch to launch." data-sq="Një ekip nga skica deri te nisja.">One team from sketch to launch.</h2>
