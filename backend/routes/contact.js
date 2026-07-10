@@ -7,6 +7,7 @@
  */
 const express = require('express');
 const { saveSubmission } = require('../lib/store');
+const { sendLeadNotification } = require('../lib/mailer');
 
 const router = express.Router();
 
@@ -40,9 +41,13 @@ router.post('/', async (req, res, next) => {
       receivedAt: new Date().toISOString(),
     };
     await saveSubmission(submission);
-
-    /* In production you'd also send an email/Slack notification here. */
     console.log(`New contact submission from ${clean.email}`);
+
+    /* Notify the studio inbox. Best-effort: the lead is already saved, so a
+       mail failure must not fail the request or lose the submission. */
+    sendLeadNotification(submission).catch((err) =>
+      console.error('[contact] lead notification error:', err)
+    );
 
     return res.status(201).json({ ok: true, message: 'Submission received.' });
   } catch (err) {
