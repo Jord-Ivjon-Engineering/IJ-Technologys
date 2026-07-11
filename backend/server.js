@@ -15,6 +15,7 @@ const reviewsRouter = require('./routes/reviews');
 const contentRouter = require('./routes/content');
 const authRouter = require('./routes/auth');
 const crmRouter = require('./routes/crm');
+const assistantRouter = require('./routes/assistant');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -54,6 +55,7 @@ app.use('/api/reviews', reviewsRouter);
 app.use('/api/content', contentRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/crm', crmRouter);
+app.use('/api/assistant', assistantRouter);
 
 app.get('/admin.html', (req, res) => {
   res.redirect(302, '/crm/#/reviews');

@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(rm -f frontend/_lap_preview.html)",
-      "Bash(taskkill //F //IM msedge.exe //T)"
+      "Bash(taskkill //F //IM msedge.exe //T)",
+      "Bash(node -e ' *)",
+      "Bash(PORT=4321 node -e ' *)"
     ]
   }
 }
