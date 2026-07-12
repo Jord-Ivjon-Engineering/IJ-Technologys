@@ -43,6 +43,14 @@ export async function renderWebsiteShowcase({ path }) {
       el('div', { 'data-field': 'tag' }),
       el('div', { 'data-field': 'description' }),
       el('div', { 'data-field': 'imageUrl' }),
+      el('label', { className: 'crm-card-label', text: 'Embed URL (iframe)' }),
+      el('input', {
+        className: 'crm-input',
+        type: 'url',
+        placeholder: 'https://liveproject.example.com — leave empty to use the image',
+        value: item.embedUrl || '',
+        'data-field': 'embedUrl',
+      }),
       el('label', { className: 'crm-card-label', text: 'Sort order' }),
       el('input', { className: 'crm-input', type: 'number', value: String(item.sortOrder ?? 0), 'data-field': 'sortOrder' }),
       cardFooter([
@@ -57,6 +65,7 @@ export async function renderWebsiteShowcase({ path }) {
               tag: tagField._bilingual.getValues(),
               description: descField._bilingual.getValues(),
               imageUrl: imageField.getValue(),
+              embedUrl: cardEl.querySelector('[data-field=embedUrl]').value.trim(),
               sortOrder: Number(cardEl.querySelector('[data-field=sortOrder]').value) || 0,
               published: cardEl.querySelector('[data-field=published]').checked,
             });
@@ -101,6 +110,7 @@ export async function renderWebsiteShowcase({ path }) {
         tag: cardEl.querySelector('[data-field=tag]')._bilingual.getValues(),
         description: cardEl.querySelector('[data-field=description]')._bilingual.getValues(),
         imageUrl: imageField && imageField.getValue ? imageField.getValue() : '',
+        embedUrl: cardEl.querySelector('[data-field=embedUrl]').value.trim(),
         sortOrder: Number(cardEl.querySelector('[data-field=sortOrder]').value) || 0,
         published: publishedInput ? publishedInput.checked : true,
       };
@@ -114,6 +124,7 @@ export async function renderWebsiteShowcase({ path }) {
         tag: { en: '', sq: '' },
         description: { en: '', sq: '' },
         imageUrl: '',
+        embedUrl: '',
         sortOrder: items.length,
         published: false,
       });

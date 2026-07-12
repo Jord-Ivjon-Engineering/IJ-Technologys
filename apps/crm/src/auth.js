@@ -34,11 +34,12 @@ export async function initAuth() {
   const { data } = await sb.auth.getSession();
   if (data.session) {
     setSession(data.session);
-    await verifyAdmin();
+    // Transient verify failures shouldn't block boot; a later call will retry.
+    try { await verifyAdmin(); } catch (_) {}
   }
   sb.auth.onAuthStateChange(async (_event, s) => {
     setSession(s);
-    if (s) await verifyAdmin();
+    if (s) { try { await verifyAdmin(); } catch (_) {} }
     else setAdminVerified(false);
   });
   document.addEventListener('visibilitychange', onVisibilityReverify);
@@ -52,7 +53,12 @@ async function reverifyAdminAccess() {
   reverifyPending = true;
   try {
     const ok = await verifyAdmin();
-    if (!ok) await forceAuthExit();
+    // Only sign out on a definitive "not authorized" (401/403). Transient
+    // failures make verifyAdmin throw, which we swallow below so a network
+    // blip during e.g. an image upload never logs the user out.
+    if (ok === false) await forceAuthExit();
+  } catch (_) {
+    // Transient re-verify failure — keep the current session as-is.
   } finally {
     reverifyPending = false;
   }
@@ -88,6 +94,10 @@ export async function signOut() {
   await forceAuthExit();
 }
 
+// Returns true when the session is a verified admin, false when the server
+// definitively rejects it (401/403). For any other failure (network error,
+// 5xx, timeout) it rethrows WITHOUT touching the verified state, so callers can
+// distinguish "not an admin" from "couldn't reach the server right now".
 export async function verifyAdmin() {
   try {
     await crmApi.get('/dashboard', { skipAuthExit: true });
@@ -98,8 +108,7 @@ export async function verifyAdmin() {
       setAdminVerified(false);
       return false;
     }
-    setAdminVerified(false);
-    return false;
+    throw err;
   }
 }
 

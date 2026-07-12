@@ -153,6 +153,7 @@ function showcaseFromRow(row) {
     title: normalizeBilingual(row.title),
     description: normalizeBilingual(row.description),
     imageUrl: row.image_url,
+    embedUrl: row.embed_url,
     published: row.published,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -166,6 +167,7 @@ function showcaseToRow(item) {
   if (item.title !== undefined) row.title = normalizeBilingual(item.title);
   if (item.description !== undefined) row.description = normalizeBilingual(item.description);
   if (item.imageUrl !== undefined) row.image_url = item.imageUrl;
+  if (item.embedUrl !== undefined) row.embed_url = item.embedUrl;
   if (item.published !== undefined) row.published = item.published;
   if (item.updatedAt !== undefined) row.updated_at = item.updatedAt;
   if (item.updatedBy !== undefined) row.updated_by = item.updatedBy;

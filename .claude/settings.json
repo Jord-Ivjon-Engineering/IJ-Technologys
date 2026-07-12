@@ -4,7 +4,13 @@
       "Bash(rm -f frontend/_lap_preview.html)",
       "Bash(taskkill //F //IM msedge.exe //T)",
       "Bash(node -e ' *)",
-      "Bash(PORT=4321 node -e ' *)"
+      "Bash(PORT=4321 node -e ' *)",
+      "Bash(curl -sI https://fitnesspractica.com/)",
+      "mcp__supabase__list_storage_buckets",
+      "mcp__supabase__get_logs",
+      "Bash(netstat -ano)",
+      "Bash(node --check frontend/js/content.js)",
+      "Bash(node --check src/pages/website/settings.js)"
     ]
   }
 }

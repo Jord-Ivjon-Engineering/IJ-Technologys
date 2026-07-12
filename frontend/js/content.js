@@ -1,4 +1,45 @@
 (function () {
+  // Live-embed thumbnails: render each iframe at a virtual desktop width and
+  // scale it down so the whole site layout fits inside the small card, instead
+  // of showing a zoomed-in crop. Frames are tracked so they can be re-fit on
+  // resize / breakpoint changes.
+  var EMBED_VIRTUAL_WIDTH = 1280;
+  var embedFrames = [];
+  var embedResizeBound = false;
+
+  function fitEmbedFrame(entry) {
+    var thumb = entry.thumb;
+    var frame = entry.frame;
+    if (!thumb || !frame || !thumb.isConnected) return;
+    var w = thumb.clientWidth;
+    var h = thumb.clientHeight;
+    if (!w || !h) return;
+    var scale = w / EMBED_VIRTUAL_WIDTH;
+    frame.style.width = EMBED_VIRTUAL_WIDTH + 'px';
+    frame.style.height = Math.ceil(h / scale) + 'px';
+    frame.style.transform = 'scale(' + scale + ')';
+    frame.style.transformOrigin = 'top left';
+  }
+
+  function fitAllEmbedFrames() {
+    embedFrames = embedFrames.filter(function (e) { return e.frame && e.frame.isConnected; });
+    embedFrames.forEach(fitEmbedFrame);
+  }
+
+  function registerEmbedFrame(thumb, frame) {
+    var entry = { thumb: thumb, frame: frame };
+    embedFrames.push(entry);
+    // Fit now (thumb has a fixed height + CSS width) and again next frame once
+    // layout has settled.
+    fitEmbedFrame(entry);
+    requestAnimationFrame(function () { fitEmbedFrame(entry); });
+    if (!embedResizeBound) {
+      embedResizeBound = true;
+      window.addEventListener('resize', fitAllEmbedFrames, { passive: true });
+      document.addEventListener('ij-cms-ready', fitAllEmbedFrames);
+    }
+  }
+
   function esc(s) {
     var d = document.createElement('div');
     d.textContent = s == null ? '' : String(s);
@@ -21,6 +62,81 @@
     var trimmed = email.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return null;
     return 'mailto:' + trimmed;
+  }
+
+  // Resolve a footer link's raw value into a safe href. Supports full http(s)
+  // URLs, mailto:/bare emails, tel:, and in-page #anchors — anything else is
+  // rejected so a bad value can't inject an unsafe scheme.
+  function footerLinkHref(url) {
+    if (!url || typeof url !== 'string') return null;
+    var t = url.trim();
+    if (!t) return null;
+    var lower = t.toLowerCase();
+    if (lower.indexOf('mailto:') === 0) return safeMailto(t.slice(7).split('?')[0]) ? t : null;
+    if (lower.indexOf('tel:') === 0) {
+      var num = t.slice(4).trim();
+      return /^[+0-9().\-\s]{3,}$/.test(num) ? 'tel:' + num.replace(/\s+/g, '') : null;
+    }
+    if (t.charAt(0) === '#') return /^#[\w-]+$/.test(t) ? t : null;
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t)) return safeMailto(t);
+    return safeHttpUrl(t);
+  }
+
+  // Pick a footer icon glyph purely from the URL — the CRM never stores one.
+  function footerLinkIcon(url) {
+    var t = (url || '').trim();
+    var lower = t.toLowerCase();
+    if (lower.indexOf('mailto:') === 0 || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t)) return '✉'; // ✉
+    if (lower.indexOf('tel:') === 0) return '✆'; // ✆
+    if (t.charAt(0) === '#') return '→'; // →
+    var host = '';
+    try { host = new URL(t, window.location.origin).hostname.replace(/^www\./, '').toLowerCase(); } catch (e) {}
+    if (/instagram\.com/.test(host)) return '◎'; // ◎
+    if (/(facebook\.com|fb\.com|fb\.me)/.test(host)) return 'Ⓕ'; // ⓕ
+    if (/linkedin\.com/.test(host)) return 'in';
+    if (/(twitter\.com|x\.com)/.test(host)) return '\u{1D54F}'; // 𝕏
+    if (/(youtube\.com|youtu\.be)/.test(host)) return '▶'; // ▶
+    if (/tiktok\.com/.test(host)) return '♪'; // ♪
+    if (/github\.com/.test(host)) return '⌘'; // ⌘
+    if (/(wa\.me|whatsapp\.com)/.test(host)) return '☎'; // ☎
+    if (/(t\.me|telegram)/.test(host)) return '✈'; // ✈
+    return '↗'; // ↗ generic external link
+  }
+
+  function renderFooterLinks(links) {
+    var container = document.getElementById('footLinks');
+    if (!container) return;
+    container.innerHTML = '';
+    (links || []).forEach(function (link) {
+      if (!link) return;
+      var rawUrl = link.url || '';
+      var href = footerLinkHref(rawUrl);
+      if (!href) return;
+      var a = document.createElement('a');
+      a.href = href;
+      if (/^https?:/i.test(href)) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+      // Preserve the old "request a call" nicety: a footer link to #contact
+      // prefills the contact form message if it's still empty.
+      if (href === '#contact') {
+        a.addEventListener('click', function () {
+          var msg = document.getElementById('cf-message');
+          if (msg && !msg.value.trim()) {
+            msg.value = document.documentElement.lang === 'sq'
+              ? 'Do të doja një telefonatë për të diskutuar projektin.'
+              : 'I would like a call to discuss my project.';
+          }
+        });
+      }
+      var ic = document.createElement('span');
+      ic.className = 'ic';
+      ic.setAttribute('aria-hidden', 'true');
+      ic.textContent = footerLinkIcon(rawUrl);
+      a.appendChild(ic);
+      var label = document.createElement('span');
+      setBilingual(label, link.label || {});
+      a.appendChild(label);
+      container.appendChild(a);
+    });
   }
 
   function setBilingual(el, obj) {
@@ -130,6 +246,8 @@
         footerCredit: settings.footer && settings.footer.credit,
         footerInstagram: settings.footer && settings.footer.instagram,
         footerRequestCall: settings.footer && settings.footer.requestCall,
+        footerLinksHeading: settings.footer && settings.footer.linksHeading,
+        footerLinks: (settings.footer && settings.footer.links) || [],
       },
       hero: Object.assign({}, hero, {
         stats: statsArr.length ? statsArr : hero.stats,
@@ -177,6 +295,7 @@
   function renderShowcase(ring, items) {
     if (!ring) return;
     ring.innerHTML = '';
+    embedFrames = [];
     if (!items || !items.length) return;
     items.forEach(function (item, i) {
       var article = document.createElement('article');
@@ -184,12 +303,30 @@
       article.style.setProperty('--i', String(i));
       var thumb = document.createElement('div');
       thumb.className = 'thumb';
-      var img = document.createElement('img');
-      img.loading = 'lazy';
-      img.src = item.imageUrl || '';
+      var embedFrame = null;
       var titleText = typeof item.title === 'object' ? (item.title.en || item.title.sq || '') : (item.title || '');
-      img.alt = titleText;
-      thumb.appendChild(img);
+      if (item.embedUrl) {
+        // Live project embed: render the actual site in an iframe instead of a
+        // static image. Sandboxed so an embedded page can't script the host.
+        thumb.classList.add('thumb-embed');
+        var frame = document.createElement('iframe');
+        frame.src = item.embedUrl;
+        frame.loading = 'lazy';
+        frame.title = titleText;
+        frame.setAttribute('scrolling', 'no');
+        frame.setAttribute('tabindex', '-1');
+        frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups');
+        frame.setAttribute('referrerpolicy', 'no-referrer');
+        frame.addEventListener('load', fitAllEmbedFrames);
+        thumb.appendChild(frame);
+        embedFrame = frame;
+      } else {
+        var img = document.createElement('img');
+        img.loading = 'lazy';
+        img.src = item.imageUrl || '';
+        img.alt = titleText;
+        thumb.appendChild(img);
+      }
       var body = document.createElement('div');
       body.className = 'body';
       var tag = document.createElement('span');
@@ -206,7 +343,21 @@
       body.appendChild(p);
       article.appendChild(thumb);
       article.appendChild(body);
+      // Whole card opens the live project in a new tab when it has an embed URL.
+      var linkUrl = item.embedUrl;
+      if (linkUrl) {
+        article.classList.add('pcard-link');
+        article.setAttribute('role', 'link');
+        article.setAttribute('tabindex', '0');
+        article.setAttribute('aria-label', titleText ? titleText + ' — open project' : 'Open project');
+        var openLink = function () { window.open(linkUrl, '_blank', 'noopener,noreferrer'); };
+        article.addEventListener('click', openLink);
+        article.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLink(); }
+        });
+      }
       ring.appendChild(article);
+      if (embedFrame) registerEmbedFrame(thumb, embedFrame);
     });
     if (typeof window.ijSyncRing === 'function') window.ijSyncRing();
   }
@@ -412,27 +563,9 @@
       if (footCopy && data.settings.footerCopyright) setBilingual(footCopy, data.settings.footerCopyright);
       var footCredit = document.querySelector('[data-cms="footer.credit"]');
       if (footCredit && data.settings.footerCredit) setBilingual(footCredit, data.settings.footerCredit);
-      var emailLink = document.querySelector('footer a[href^="mailto:"]');
-      if (emailLink && data.settings.contactEmail) {
-        var mailto = safeMailto(data.settings.contactEmail);
-        if (mailto) {
-          emailLink.href = mailto;
-          var emailText = emailLink.querySelector('span.ic') ? emailLink.lastChild : emailLink;
-          if (emailText && emailText.nodeType === 3) emailText.textContent = data.settings.contactEmail;
-          else if (emailLink.childNodes.length > 1) emailLink.childNodes[emailLink.childNodes.length - 1].textContent = data.settings.contactEmail;
-        }
-      }
-      var igLink = document.querySelector('footer .foot-col a[target="_blank"]');
-      if (igLink && data.settings.footerInstagram) {
-        var igUrl = safeHttpUrl(data.settings.footerInstagram);
-        if (igUrl) igLink.href = igUrl;
-      }
-      var reqCalls = document.querySelectorAll('[data-cms="footer.requestCall"]');
-      if (reqCalls.length && data.settings.footerRequestCall) {
-        reqCalls.forEach(function (reqCall) {
-          setBilingual(reqCall, data.settings.footerRequestCall);
-        });
-      }
+      var footLinksHead = document.querySelector('[data-cms="footer.linksHeading"]');
+      if (footLinksHead && data.settings.footerLinksHeading) setBilingual(footLinksHead, data.settings.footerLinksHeading);
+      renderFooterLinks(data.settings.footerLinks);
     }
 
     document.dispatchEvent(new CustomEvent('ij-cms-ready'));
@@ -514,6 +647,7 @@
           title: item.title,
           description: item.description,
           imageUrl: item.imageUrl,
+          embedUrl: item.embedUrl,
         };
       });
       out.showcaseProjects = showcase;

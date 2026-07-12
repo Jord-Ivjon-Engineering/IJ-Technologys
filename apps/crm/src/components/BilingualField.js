@@ -18,13 +18,16 @@ export function BilingualField({ label, name, value = {}, onChange, multiline })
   const makeInput = (lang, val) => {
     const attrs = {
       className: 'crm-input',
-      value: val,
       'data-lang': lang,
       'data-name': name,
     };
     const node = multiline
       ? el('textarea', { ...attrs, rows: '3' })
       : el('input', { ...attrs, type: 'text' });
+    // Set via the .value property, not an attribute: a <textarea> ignores a
+    // `value` attribute (its initial text comes from child content), so the
+    // saved description would otherwise render blank on load.
+    node.value = val;
     node.addEventListener('input', () => {
       onChange({
         en: lang === 'en' ? node.value : enInput.value,

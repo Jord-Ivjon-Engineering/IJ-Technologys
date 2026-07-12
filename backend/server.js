@@ -37,6 +37,8 @@ app.use((req, res, next) => {
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https:",
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+      // Allow showcase cards to embed live projects over https (see 0018 embed_url).
+      "frame-src 'self' https:",
       "frame-ancestors 'self'",
       "base-uri 'self'",
       "form-action 'self'",
