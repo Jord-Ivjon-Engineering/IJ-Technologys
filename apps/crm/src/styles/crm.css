@@ -665,7 +665,25 @@ textarea.crm-input:focus {
 .crm-bilingual-col {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+}
+
+.crm-char-count {
+  align-self: flex-end;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: #666;
+  font-variant-numeric: tabular-nums;
+}
+
+.crm-char-count.is-low {
+  color: #b35c00;
+  font-weight: 600;
+}
+
+.crm-char-count.is-over {
+  color: #c0392b;
+  font-weight: 600;
 }
 
 .crm-lang-tag {

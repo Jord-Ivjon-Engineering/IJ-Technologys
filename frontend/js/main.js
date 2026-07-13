@@ -211,17 +211,63 @@ let cardStep = 360;
 let ringTravel = 0;
 let targetRot = 0, currentRot = 0, ticking = false;
 let ringGlobeSync = 0;
+let overhangRaf = 0;
+
+function updateProjectsOverhang() {
+  if (!isDesktopDisplay()) {
+    document.documentElement.style.setProperty('--projects-overhang', '0px');
+    return;
+  }
+  const stage = document.querySelector('.projects-stage');
+  const scene = document.querySelector('.orbit-scene');
+  const cards = document.querySelectorAll('.pcard');
+  if (!stage || !scene || !cards.length) {
+    document.documentElement.style.setProperty('--projects-overhang', '0px');
+    return;
+  }
+  let maxCardHeight = 0;
+  cards.forEach(card => {
+    maxCardHeight = Math.max(maxCardHeight, card.offsetHeight);
+  });
+  const stageRect = stage.getBoundingClientRect();
+  const sceneRect = scene.getBoundingClientRect();
+  const ringCenterY = sceneRect.top + sceneRect.height / 2;
+  const topOffset = Math.abs(parseFloat(getComputedStyle(cards[0]).top) || 110);
+  const cardBottom = ringCenterY - topOffset + maxCardHeight;
+  const overhang = Math.max(0, Math.ceil(cardBottom - stageRect.bottom + 16));
+  document.documentElement.style.setProperty('--projects-overhang', overhang + 'px');
+}
+
+function scheduleProjectsOverhang() {
+  if (overhangRaf) cancelAnimationFrame(overhangRaf);
+  overhangRaf = requestAnimationFrame(() => {
+    overhangRaf = requestAnimationFrame(updateProjectsOverhang);
+  });
+}
+
+function bindCardOverhangWatchers() {
+  document.querySelectorAll('.pcard img, .pcard iframe').forEach(el => {
+    if (el.dataset.overhangBound) return;
+    el.dataset.overhangBound = '1';
+    el.addEventListener('load', scheduleProjectsOverhang);
+  });
+}
 
 function syncRingLayout() {
   const cards = document.querySelectorAll('.pcard');
   cardSlots = cards.length;
-  if (!cardSlots) return;
+  if (!cardSlots) {
+    document.documentElement.style.setProperty('--projects-overhang', '0px');
+    return;
+  }
   cardStep = 360 / cardSlots;
   ringTravel = (cardSlots - 1) * cardStep;
   cards.forEach((card, i) => card.style.setProperty('--i', String(i)));
   updateRing();
   updateCardTransforms(currentRot);
   if (typeof setRadius === 'function') setRadius();
+  bindCardOverhangWatchers();
+  scheduleProjectsOverhang();
 }
 window.ijSyncRing = syncRingLayout;
 
@@ -275,6 +321,7 @@ if(isDesktopDisplay()){
     const r = w <= 560 ? 240 : w <= 1020 ? 320 : 420;
     document.querySelectorAll('.pcard').forEach(c=> c.style.setProperty('--radius', r + 'px'));
     updateCardTransforms(currentRot);
+    scheduleProjectsOverhang();
   }
   setRadius();
   updateCardTransforms(0);

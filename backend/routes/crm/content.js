@@ -20,6 +20,19 @@ const {
 
 const router = express.Router();
 
+const SHOWCASE_DESC_MAX = 173;
+
+function showcaseDescriptionFields(description) {
+  if (description === undefined) return [];
+  const val = description && typeof description === 'object'
+    ? { en: description.en || '', sq: description.sq || '' }
+    : { en: String(description || ''), sq: String(description || '') };
+  const fields = [];
+  if (val.en.length > SHOWCASE_DESC_MAX) fields.push('description.en');
+  if (val.sq.length > SHOWCASE_DESC_MAX) fields.push('description.sq');
+  return fields;
+}
+
 router.get('/settings', async (req, res, next) => {
   try {
     const data = await getSiteSettings();
@@ -57,6 +70,14 @@ router.post('/showcase', async (req, res, next) => {
     if (!body.title || (typeof body.title !== 'string' && typeof body.title !== 'object')) {
       return res.status(400).json({ ok: false, error: 'Validation failed.', fields: ['title'] });
     }
+    const descFields = showcaseDescriptionFields(body.description);
+    if (descFields.length) {
+      return res.status(400).json({
+        ok: false,
+        error: `Description must be ${SHOWCASE_DESC_MAX} characters or fewer per language.`,
+        fields: descFields,
+      });
+    }
     const item = await createShowcase(body, req.adminUser?.id);
     res.status(201).json({ ok: true, item });
   } catch (err) {
@@ -66,6 +87,14 @@ router.post('/showcase', async (req, res, next) => {
 
 router.patch('/showcase/:id', async (req, res, next) => {
   try {
+    const descFields = showcaseDescriptionFields(req.body?.description);
+    if (descFields.length) {
+      return res.status(400).json({
+        ok: false,
+        error: `Description must be ${SHOWCASE_DESC_MAX} characters or fewer per language.`,
+        fields: descFields,
+      });
+    }
     const item = await updateShowcase(req.params.id, req.body || {}, req.adminUser?.id);
     if (!item) return res.status(404).json({ ok: false, error: 'Showcase item not found.' });
     res.json({ ok: true, item });

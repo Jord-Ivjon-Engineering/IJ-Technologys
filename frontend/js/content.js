@@ -47,6 +47,8 @@
   }
 
   function safeHttpUrl(url) {
+    var utils = window.ijFooterLinkUtils;
+    if (utils && utils.safeHttpUrlForFooter) return utils.safeHttpUrlForFooter(url);
     if (!url || typeof url !== 'string') return null;
     try {
       var u = new URL(url.trim(), window.location.origin);
@@ -78,29 +80,15 @@
       return /^[+0-9().\-\s]{3,}$/.test(num) ? 'tel:' + num.replace(/\s+/g, '') : null;
     }
     if (t.charAt(0) === '#') return /^#[\w-]+$/.test(t) ? t : null;
+    if (t.indexOf('/') >= 0 || t.indexOf('://') >= 0) return safeHttpUrl(t);
     if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t)) return safeMailto(t);
     return safeHttpUrl(t);
   }
 
-  // Pick a footer icon glyph purely from the URL — the CRM never stores one.
   function footerLinkIcon(url) {
-    var t = (url || '').trim();
-    var lower = t.toLowerCase();
-    if (lower.indexOf('mailto:') === 0 || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t)) return '✉'; // ✉
-    if (lower.indexOf('tel:') === 0) return '✆'; // ✆
-    if (t.charAt(0) === '#') return '→'; // →
-    var host = '';
-    try { host = new URL(t, window.location.origin).hostname.replace(/^www\./, '').toLowerCase(); } catch (e) {}
-    if (/instagram\.com/.test(host)) return '◎'; // ◎
-    if (/(facebook\.com|fb\.com|fb\.me)/.test(host)) return 'Ⓕ'; // ⓕ
-    if (/linkedin\.com/.test(host)) return 'in';
-    if (/(twitter\.com|x\.com)/.test(host)) return '\u{1D54F}'; // 𝕏
-    if (/(youtube\.com|youtu\.be)/.test(host)) return '▶'; // ▶
-    if (/tiktok\.com/.test(host)) return '♪'; // ♪
-    if (/github\.com/.test(host)) return '⌘'; // ⌘
-    if (/(wa\.me|whatsapp\.com)/.test(host)) return '☎'; // ☎
-    if (/(t\.me|telegram)/.test(host)) return '✈'; // ✈
-    return '↗'; // ↗ generic external link
+    var utils = window.ijFooterLinkUtils;
+    if (utils && utils.footerLinkIcon) return utils.footerLinkIcon(url);
+    return '↗';
   }
 
   function renderFooterLinks(links) {

@@ -7,6 +7,8 @@ import { renderShell, btn, card, cardFooter, toggleBtn, errorBlock } from '../..
 import { previewBtn } from '../../components/SitePreviewModal.js';
 import { refresh } from '../../router.js';
 
+const SHOWCASE_DESC_MAX = 173;
+
 function showcaseLabel(value) {
   if (!value) return 'Untitled';
   if (typeof value === 'object') return value.en || value.sq || 'Untitled';
@@ -59,6 +61,10 @@ export async function renderWebsiteShowcase({ path }) {
           const titleField = cardEl.querySelector('[data-field=title]');
           const tagField = cardEl.querySelector('[data-field=tag]');
           const descField = cardEl.querySelector('[data-field=description]');
+          if (!descField._bilingual.isValid()) {
+            showToast('Description must be ' + SHOWCASE_DESC_MAX + ' characters or fewer per language', 'error');
+            return;
+          }
           try {
             await crmApi.patch('/content/showcase/' + item.id, {
               title: titleField._bilingual.getValues(),
@@ -88,7 +94,7 @@ export async function renderWebsiteShowcase({ path }) {
     tagWrap.appendChild(tagField);
 
     const descWrap = cardEl.querySelector('[data-field=description]');
-    const descField = BilingualField({ label: 'Description', name: 'desc', value: item.description || {}, onChange: () => {}, multiline: true });
+    const descField = BilingualField({ label: 'Description', name: 'desc', value: item.description || {}, onChange: () => {}, multiline: true, maxLength: SHOWCASE_DESC_MAX });
     descWrap._bilingual = descField;
     descWrap.appendChild(descField);
 

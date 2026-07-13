@@ -5,28 +5,7 @@ import { showToast } from '../../components/Toast.js';
 import { renderShell, btn, sectionCard, errorBlock } from '../../components/shell.js';
 import { previewBtn } from '../../components/SitePreviewModal.js';
 
-// Preview-only mirror of the site's URL→icon logic (frontend/js/content.js).
-// The icon is derived, never stored — this just shows the user what the public
-// site will render for a given URL.
-function footerIcon(url) {
-  const t = (url || '').trim();
-  const lower = t.toLowerCase();
-  if (lower.startsWith('mailto:') || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t)) return '✉';
-  if (lower.startsWith('tel:')) return '✆';
-  if (t.startsWith('#')) return '→';
-  let host = '';
-  try { host = new URL(t, window.location.origin).hostname.replace(/^www\./, '').toLowerCase(); } catch { /* not a URL yet */ }
-  if (/instagram\.com/.test(host)) return '◎';
-  if (/(facebook\.com|fb\.com|fb\.me)/.test(host)) return 'Ⓕ';
-  if (/linkedin\.com/.test(host)) return 'in';
-  if (/(twitter\.com|x\.com)/.test(host)) return '\u{1D54F}';
-  if (/(youtube\.com|youtu\.be)/.test(host)) return '▶';
-  if (/tiktok\.com/.test(host)) return '♪';
-  if (/github\.com/.test(host)) return '⌘';
-  if (/(wa\.me|whatsapp\.com)/.test(host)) return '☎';
-  if (/(t\.me|telegram)/.test(host)) return '✈';
-  return t ? '↗' : '·';
-}
+import { footerLinkIcon } from '../../lib/footerLinkUtils.js';
 
 export async function renderWebsiteSettings({ path }) {
   let settings;
@@ -64,7 +43,7 @@ export async function renderWebsiteSettings({ path }) {
       placeholder: 'https://…   ·   mailto:hello@…   ·   tel:+355…   ·   #contact',
       value: link.url || '',
     });
-    const syncIcon = () => { iconPreview.textContent = footerIcon(urlInput.value); };
+    const syncIcon = () => { iconPreview.textContent = footerLinkIcon(urlInput.value); };
     urlInput.addEventListener('input', syncIcon);
     syncIcon();
 
