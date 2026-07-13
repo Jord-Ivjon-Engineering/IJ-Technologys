@@ -1,6 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "npm install && npm install --prefix apps/crm --include=dev && npm run build:crm",
   "functions": {
     "api/index.js": {
       "includeFiles": "frontend/crm/**"

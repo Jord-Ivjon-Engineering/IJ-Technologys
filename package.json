@@ -7,7 +7,9 @@
     "start": "node backend/server.js",
     "dev": "node --watch backend/server.js",
     "dev:crm": "npm run dev --prefix apps/crm",
-    "build:crm": "npm run build --prefix apps/crm && node scripts/copy-crm-dist.mjs",
+    "build:crm": "npm install --prefix apps/crm --include=dev && npm run build --prefix apps/crm && node scripts/copy-crm-dist.mjs",
+    "build": "npm run build:crm",
+    "postinstall": "node scripts/vercel-postinstall.mjs",
     "test:crm-visibility": "node scripts/test-crm-visibility.mjs"
   },
   "engines": {
