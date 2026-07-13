@@ -56,7 +56,7 @@ export async function forceAuthExit() {
   stopIdleWatch();
   setAdminVerified(false);
   setSession(null);
-  window.location.replace('/login.html');
+  window.location.replace('/login');
   try {
     const { getSupabase } = await import('./auth.js');
     const sb = getSupabase();

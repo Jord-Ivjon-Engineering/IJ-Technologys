@@ -1,6 +1,9 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function createSupabaseClient(url, key) {
+  if (!window.supabase?.createClient) throw new Error('Auth client failed to load.');
+  return window.supabase.createClient(url, key);
+}
 
 function getTheme() {
   return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
@@ -82,7 +85,7 @@ function redirectForRole(role) {
     return;
   }
   if (role === 'client') {
-    window.location.href = '/portal.html';
+    window.location.href = '/portal';
   }
 }
 
@@ -108,7 +111,7 @@ async function boot() {
     return;
   }
 
-  const sb = createClient(config.supabaseUrl, config.supabaseAnonKey);
+  const sb = createSupabaseClient(config.supabaseUrl, config.supabaseAnonKey);
   await tryExistingSession(sb);
 
   const form = document.getElementById('loginForm');

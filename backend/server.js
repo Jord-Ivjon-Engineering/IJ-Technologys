@@ -36,7 +36,7 @@ app.use((req, res, next) => {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https:",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net",
       // Allow showcase cards to embed live projects over https (see 0018 embed_url).
       "frame-src 'self' https:",
       "frame-ancestors 'self'",
@@ -59,16 +59,32 @@ app.use('/api/auth', authRouter);
 app.use('/api/crm', crmRouter);
 app.use('/api/assistant', assistantRouter);
 
-app.get('/admin.html', (req, res) => {
+app.get('/admin', (req, res) => {
   res.redirect(302, '/crm/#/reviews');
 });
 
+app.get('/admin.html', (req, res) => {
+  res.redirect(301, '/admin');
+});
+
 app.get('/login', (req, res) => {
-  res.redirect(302, '/login.html');
+  res.sendFile(path.join(FRONTEND_DIR, 'login.html'));
+});
+
+app.get('/login.html', (req, res) => {
+  res.redirect(301, '/login');
 });
 
 app.get('/portal', (req, res) => {
-  res.redirect(302, '/portal.html');
+  res.sendFile(path.join(FRONTEND_DIR, 'portal.html'));
+});
+
+app.get('/portal.html', (req, res) => {
+  res.redirect(301, '/portal');
+});
+
+app.get('/index.html', (req, res) => {
+  res.redirect(301, '/');
 });
 
 app.use('/crm', express.static(CRM_DIST_DIR));
@@ -78,7 +94,7 @@ app.get('/crm/*', (req, res) => {
 
 app.use(express.static(FRONTEND_DIR));
 
-app.get(/^\/(?!api\/|crm\/|login\.html|portal\.html|login|portal).*/, (req, res) => {
+app.get(/^\/(?!api\/|crm\/|login|portal|admin).*/, (req, res) => {
   res.sendFile(path.join(FRONTEND_DIR, 'index.html'));
 });
 

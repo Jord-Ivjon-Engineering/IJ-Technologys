@@ -1,5 +1,7 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
+function createSupabaseClient(url, key) {
+  if (!window.supabase?.createClient) throw new Error('Auth client failed to load.');
+  return window.supabase.createClient(url, key);
+}
 function getTheme() {
   return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
 }
@@ -74,14 +76,14 @@ async function boot() {
   try {
     config = await loadConfig();
   } catch {
-    window.location.href = '/login.html';
+    window.location.href = '/login';
     return;
   }
 
-  const sb = createClient(config.supabaseUrl, config.supabaseAnonKey);
+  const sb = createSupabaseClient(config.supabaseUrl, config.supabaseAnonKey);
   const { data } = await sb.auth.getSession();
   if (!data.session?.access_token) {
-    window.location.href = '/login.html';
+    window.location.href = '/login';
     return;
   }
 
@@ -90,7 +92,7 @@ async function boot() {
     me = await fetchMe(data.session.access_token);
   } catch {
     await sb.auth.signOut();
-    window.location.href = '/login.html';
+    window.location.href = '/login';
     return;
   }
 
@@ -101,7 +103,7 @@ async function boot() {
 
   if (me.role !== 'client') {
     await sb.auth.signOut();
-    window.location.href = '/login.html';
+    window.location.href = '/login';
     return;
   }
 
