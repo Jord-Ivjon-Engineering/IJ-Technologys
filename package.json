@@ -7,7 +7,7 @@
     "start": "node backend/server.js",
     "dev": "node --watch backend/server.js",
     "dev:crm": "npm run dev --prefix apps/crm",
-    "build:crm": "npm run build --prefix apps/crm",
+    "build:crm": "npm run build --prefix apps/crm && node scripts/copy-crm-dist.mjs",
     "test:crm-visibility": "node scripts/test-crm-visibility.mjs"
   },
   "engines": {

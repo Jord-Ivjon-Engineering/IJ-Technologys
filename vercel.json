@@ -1,17 +1,12 @@
 {
-  "version": 2,
-  "installCommand": "npm install && npm install --prefix apps/crm --include=dev",
-  "buildCommand": "npm run build:crm",
-  "builds": [
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": "apps/crm/dist/**"
-      }
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm install && npm install --prefix apps/crm --include=dev && npm run build:crm",
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "frontend/crm/**"
     }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/api/index.js" }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index.js" }
   ]
 }

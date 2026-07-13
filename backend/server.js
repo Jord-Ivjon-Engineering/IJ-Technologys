@@ -7,6 +7,7 @@
  */
 require('dotenv').config();
 
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 
@@ -20,7 +21,12 @@ const assistantRouter = require('./routes/assistant');
 const app = express();
 const PORT = process.env.PORT || 4000;
 const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
-const CRM_DIST_DIR = path.join(__dirname, '..', 'apps', 'crm', 'dist');
+const CRM_DIST_DEPLOYED = path.join(FRONTEND_DIR, 'crm');
+const CRM_DIST_SOURCE = path.join(__dirname, '..', 'apps', 'crm', 'dist');
+const CRM_INDEX_DEPLOYED = path.join(CRM_DIST_DEPLOYED, 'index.html');
+const CRM_INDEX_SOURCE = path.join(CRM_DIST_SOURCE, 'index.html');
+const CRM_DIST_DIR = fs.existsSync(CRM_INDEX_DEPLOYED) ? CRM_DIST_DEPLOYED : CRM_DIST_SOURCE;
+const CRM_INDEX_FILE = fs.existsSync(CRM_INDEX_DEPLOYED) ? CRM_INDEX_DEPLOYED : CRM_INDEX_SOURCE;
 
 /* ---- middleware ---- */
 app.use((req, res, next) => {
@@ -89,7 +95,7 @@ app.get('/index.html', (req, res) => {
 
 app.use('/crm', express.static(CRM_DIST_DIR));
 app.get('/crm/*', (req, res) => {
-  res.sendFile(path.join(CRM_DIST_DIR, 'index.html'));
+  res.sendFile(CRM_INDEX_FILE);
 });
 
 app.use(express.static(FRONTEND_DIR));

@@ -17,5 +17,6 @@ backend/data/
 
 # CRM build output (rebuild with npm run build:crm)
 apps/crm/dist/
+frontend/crm/
 .vercel
 .env*
