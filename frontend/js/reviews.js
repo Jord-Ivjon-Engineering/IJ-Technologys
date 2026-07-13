@@ -30,9 +30,33 @@
   /* Render each review exactly once — no duplication/looping. Cards sit in a
      static, centered row that wraps as more reviews come in. */
   const items = []; // newest first
+  let reviewsLoaded = false;
+  const lang = function(){ return document.documentElement.lang === 'sq' ? 'sq' : 'en'; };
+  const EMPTY_MSG = {
+    text: {
+      en: 'We\'re proud of the work we do with our clients — and your words would mean a lot. We don\'t have any public reviews yet. If we\'ve worked together, would you share your experience?',
+      sq: 'Jemi krenarë për punën që bëjmë me klientët tanë — dhe fjalët tuaja do të na ndihmonin shumë. Ende nuk kemi vlerësime publike. Nëse kemi punuar së bashku, do të ndash përvojën tënde?'
+    },
+    cta: {
+      en: 'Leave the first review',
+      sq: 'Lër vlerësimin e parë'
+    }
+  };
+  function emptyHTML(){
+    const l = lang();
+    return '<div class="reviews-empty reveal in">'
+      + '<p class="reviews-empty-text">' + escapeHtml(EMPTY_MSG.text[l]) + '</p>'
+      + '<a class="btn primary" href="#review">' + escapeHtml(EMPTY_MSG.cta[l]) + '</a>'
+      + '</div>';
+  }
   function render(){
     if(!marquee) return;
     marquee.classList.add('is-static');
+    if(!items.length){
+      if(!reviewsLoaded) return;
+      marquee.innerHTML = emptyHTML();
+      return;
+    }
     marquee.innerHTML = items.map(cardHTML).join('');
   }
   function addReview(r, toFront){
@@ -47,10 +71,17 @@
     .then(function(data){
       if(data && data.ok && Array.isArray(data.reviews) && data.reviews.length){
         data.reviews.forEach(function(r){ items.push(r); });
-        render();
       }
     })
-    .catch(function(){});
+    .catch(function(){})
+    .finally(function(){
+      reviewsLoaded = true;
+      render();
+    });
+
+  window.reviewsRefreshLang = function(){
+    if(!items.length && reviewsLoaded) render();
+  };
 
   if(!form) return;
 
@@ -80,7 +111,6 @@
     rating: { en:'Please pick a star rating.', sq:'Ju lutemi zgjidhni një vlerësim me yje.' },
     text: { en:'Please write at least 10 characters.', sq:'Ju lutemi shkruani të paktën 10 karaktere.' },
   };
-  const lang = function(){ return document.documentElement.lang === 'sq' ? 'sq' : 'en'; };
   const say = function(key, kind){ status.textContent = MSG[key][lang()]; status.className = 'form-status' + (kind ? ' ' + kind : ''); };
 
   function clearErrors(){

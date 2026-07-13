@@ -45,11 +45,11 @@ export async function renderWebsiteShowcase({ path }) {
       el('div', { 'data-field': 'tag' }),
       el('div', { 'data-field': 'description' }),
       el('div', { 'data-field': 'imageUrl' }),
-      el('label', { className: 'crm-card-label', text: 'Embed URL (iframe)' }),
+      el('label', { className: 'crm-card-label', text: 'Project link' }),
       el('input', {
         className: 'crm-input',
         type: 'url',
-        placeholder: 'https://liveproject.example.com — leave empty to use the image',
+        placeholder: 'https://example.com — opens in a new tab when the card is clicked',
         value: item.embedUrl || '',
         'data-field': 'embedUrl',
       }),
@@ -99,7 +99,7 @@ export async function renderWebsiteShowcase({ path }) {
     descWrap.appendChild(descField);
 
     const imageWrap = cardEl.querySelector('[data-field=imageUrl]');
-    imageField = ImageUploadField({ label: 'Project image', value: item.imageUrl || '' });
+    imageField = ImageUploadField({ label: 'Screenshot', value: item.imageUrl || '' });
     imageWrap.appendChild(imageField);
 
     cardEl.dataset.showcaseId = item.id;

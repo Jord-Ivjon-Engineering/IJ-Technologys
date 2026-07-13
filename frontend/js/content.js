@@ -1,45 +1,4 @@
 (function () {
-  // Live-embed thumbnails: render each iframe at a virtual desktop width and
-  // scale it down so the whole site layout fits inside the small card, instead
-  // of showing a zoomed-in crop. Frames are tracked so they can be re-fit on
-  // resize / breakpoint changes.
-  var EMBED_VIRTUAL_WIDTH = 1280;
-  var embedFrames = [];
-  var embedResizeBound = false;
-
-  function fitEmbedFrame(entry) {
-    var thumb = entry.thumb;
-    var frame = entry.frame;
-    if (!thumb || !frame || !thumb.isConnected) return;
-    var w = thumb.clientWidth;
-    var h = thumb.clientHeight;
-    if (!w || !h) return;
-    var scale = w / EMBED_VIRTUAL_WIDTH;
-    frame.style.width = EMBED_VIRTUAL_WIDTH + 'px';
-    frame.style.height = Math.ceil(h / scale) + 'px';
-    frame.style.transform = 'scale(' + scale + ')';
-    frame.style.transformOrigin = 'top left';
-  }
-
-  function fitAllEmbedFrames() {
-    embedFrames = embedFrames.filter(function (e) { return e.frame && e.frame.isConnected; });
-    embedFrames.forEach(fitEmbedFrame);
-  }
-
-  function registerEmbedFrame(thumb, frame) {
-    var entry = { thumb: thumb, frame: frame };
-    embedFrames.push(entry);
-    // Fit now (thumb has a fixed height + CSS width) and again next frame once
-    // layout has settled.
-    fitEmbedFrame(entry);
-    requestAnimationFrame(function () { fitEmbedFrame(entry); });
-    if (!embedResizeBound) {
-      embedResizeBound = true;
-      window.addEventListener('resize', fitAllEmbedFrames, { passive: true });
-      document.addEventListener('ij-cms-ready', fitAllEmbedFrames);
-    }
-  }
-
   function esc(s) {
     var d = document.createElement('div');
     d.textContent = s == null ? '' : String(s);
@@ -155,6 +114,27 @@
   function planLabel(plan) {
     if (typeof plan.name === 'object') return plan.name.en || plan.name.sq || plan.slug || '';
     return plan.name || plan.slug || '';
+  }
+
+  function planPriceText(plan) {
+    if (plan.priceLabel != null && plan.priceLabel !== '') {
+      if (typeof plan.priceLabel === 'object') {
+        return (plan.priceLabel.en || plan.priceLabel.sq || '').trim();
+      }
+      return String(plan.priceLabel).trim();
+    }
+    if (plan.price != null && plan.price !== '') {
+      if (typeof plan.price === 'object') {
+        return (plan.price.en || plan.price.sq || '').trim();
+      }
+      return String(plan.price).trim();
+    }
+    return '';
+  }
+
+  function hasBilingualText(obj) {
+    if (!obj || typeof obj !== 'object') return false;
+    return Boolean((obj.en || '').trim() || (obj.sq || '').trim());
   }
 
   function normalizePayload(raw) {
@@ -283,7 +263,6 @@
   function renderShowcase(ring, items) {
     if (!ring) return;
     ring.innerHTML = '';
-    embedFrames = [];
     if (!items || !items.length) return;
     items.forEach(function (item, i) {
       var article = document.createElement('article');
@@ -291,30 +270,13 @@
       article.style.setProperty('--i', String(i));
       var thumb = document.createElement('div');
       thumb.className = 'thumb';
-      var embedFrame = null;
       var titleText = typeof item.title === 'object' ? (item.title.en || item.title.sq || '') : (item.title || '');
-      if (item.embedUrl) {
-        // Live project embed: render the actual site in an iframe instead of a
-        // static image. Sandboxed so an embedded page can't script the host.
-        thumb.classList.add('thumb-embed');
-        var frame = document.createElement('iframe');
-        frame.src = item.embedUrl;
-        frame.loading = 'lazy';
-        frame.title = titleText;
-        frame.setAttribute('scrolling', 'no');
-        frame.setAttribute('tabindex', '-1');
-        frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups');
-        frame.setAttribute('referrerpolicy', 'no-referrer');
-        frame.addEventListener('load', fitAllEmbedFrames);
-        thumb.appendChild(frame);
-        embedFrame = frame;
-      } else {
-        var img = document.createElement('img');
-        img.loading = 'lazy';
-        img.src = item.imageUrl || '';
-        img.alt = titleText;
-        thumb.appendChild(img);
-      }
+      var img = document.createElement('img');
+      img.loading = 'lazy';
+      img.src = item.imageUrl || '';
+      img.alt = titleText;
+      if (!item.imageUrl) thumb.classList.add('thumb-empty');
+      thumb.appendChild(img);
       var body = document.createElement('div');
       body.className = 'body';
       var tag = document.createElement('span');
@@ -331,8 +293,7 @@
       body.appendChild(p);
       article.appendChild(thumb);
       article.appendChild(body);
-      // Whole card opens the live project in a new tab when it has an embed URL.
-      var linkUrl = item.embedUrl;
+      var linkUrl = safeHttpUrl(item.embedUrl);
       if (linkUrl) {
         article.classList.add('pcard-link');
         article.setAttribute('role', 'link');
@@ -345,7 +306,6 @@
         });
       }
       ring.appendChild(article);
-      if (embedFrame) registerEmbedFrame(thumb, embedFrame);
     });
     if (typeof window.ijSyncRing === 'function') window.ijSyncRing();
   }
@@ -357,8 +317,9 @@
     grid.innerHTML = '';
     plans.forEach(function (plan, i) {
       var planName = planLabel(plan);
+      var contactOnly = !planPriceText(plan);
       var div = document.createElement('div');
-      div.className = 'plan' + (plan.highlighted ? ' pro' : '') + (i ? ' reveal d' + i : ' reveal');
+      div.className = 'plan' + (plan.highlighted ? ' pro' : '') + (contactOnly ? ' plan-contact' : '') + (i ? ' reveal d' + i : ' reveal');
       if (plan.highlighted) {
         var flag = document.createElement('span');
         flag.className = 'flag';
@@ -367,17 +328,6 @@
       }
       var h3 = document.createElement('h3');
       h3.textContent = planName;
-      var price = document.createElement('div');
-      price.className = 'price';
-      if (plan.priceLabel) {
-        if (typeof plan.priceLabel === 'object') setBilingual(price, plan.priceLabel);
-        else price.textContent = plan.priceLabel;
-      } else if (typeof plan.price === 'object') setBilingual(price, plan.price);
-      else price.textContent = plan.price || '';
-      var per = document.createElement('div');
-      per.className = 'per';
-      if (plan.perLabel) setBilingual(per, plan.perLabel);
-      else setBilingual(per, plan.period || {});
       var ul = document.createElement('ul');
       (plan.features || []).forEach(function (f) {
         var li = document.createElement('li');
@@ -388,10 +338,30 @@
       cta.className = 'btn plan-cta' + (plan.highlighted ? ' primary' : '');
       cta.href = '#contact';
       cta.setAttribute('data-plan', planName);
-      setBilingual(cta, { en: 'Start with ' + planName, sq: 'Nis me ' + planName });
+      if (contactOnly) {
+        setBilingual(cta, { en: 'Contact us', sq: 'Na kontaktoni' });
+      } else {
+        setBilingual(cta, { en: 'Start with ' + planName, sq: 'Nis me ' + planName });
+      }
       div.appendChild(h3);
-      div.appendChild(price);
-      div.appendChild(per);
+      if (!contactOnly) {
+        var price = document.createElement('div');
+        price.className = 'price';
+        if (plan.priceLabel) {
+          if (typeof plan.priceLabel === 'object') setBilingual(price, plan.priceLabel);
+          else price.textContent = plan.priceLabel;
+        } else if (typeof plan.price === 'object') setBilingual(price, plan.price);
+        else price.textContent = plan.price || '';
+        div.appendChild(price);
+      }
+      var perSource = plan.perLabel || plan.period;
+      if (hasBilingualText(perSource) || (typeof perSource === 'string' && perSource.trim())) {
+        var per = document.createElement('div');
+        per.className = 'per';
+        if (plan.perLabel) setBilingual(per, plan.perLabel);
+        else setBilingual(per, plan.period || {});
+        div.appendChild(per);
+      }
       div.appendChild(ul);
       div.appendChild(cta);
       grid.appendChild(div);
@@ -410,9 +380,7 @@
     while (select.options.length > 1) select.remove(1);
     plans.forEach(function (plan) {
       var name = planLabel(plan);
-      var price = typeof plan.priceLabel === 'object'
-        ? (plan.priceLabel.en || plan.priceLabel.sq || '')
-        : (plan.priceLabel || '');
+      var price = planPriceText(plan);
       var opt = document.createElement('option');
       opt.value = name;
       opt.textContent = price ? name + ' (' + price + ')' : name;
@@ -569,12 +537,35 @@
   }
 
   var pendingPreviewDraft = null;
+  var CMS_VERSION_KEY = 'ij-cms-version';
+
+  function storeCmsVersion(version) {
+    if (!version) return;
+    try { localStorage.setItem(CMS_VERSION_KEY, version); } catch (e) {}
+  }
+
+  function readCmsVersion() {
+    try { return localStorage.getItem(CMS_VERSION_KEY) || ''; } catch (e) { return ''; }
+  }
 
   window.addEventListener('message', function (e) {
     if (e.origin !== window.location.origin) return;
-    if (!e.data || e.data.type !== 'ij-cms-preview-draft') return;
-    pendingPreviewDraft = e.data.draft || null;
-    if (isPreviewMode()) window.ijLoadCmsContent();
+    if (!e.data) return;
+    if (e.data.type === 'ij-cms-preview-draft') {
+      pendingPreviewDraft = e.data.draft || null;
+      if (isPreviewMode()) window.ijLoadCmsContent();
+      return;
+    }
+    if (e.data.type === 'ij-cms-content-updated') {
+      storeCmsVersion(e.data.version);
+      if (!isPreviewMode()) window.ijLoadCmsContent(true);
+    }
+  });
+
+  window.addEventListener('storage', function (e) {
+    if (e.key !== CMS_VERSION_KEY || !e.newValue) return;
+    if (isPreviewMode()) return;
+    window.ijLoadCmsContent(true);
   });
 
   function readPreviewDraft() {
@@ -677,12 +668,18 @@
     document.body.prepend(bar);
   }
 
-  window.ijLoadCmsContent = function () {
+  window.ijLoadCmsContent = function (forceRefresh) {
     var draft = readPreviewDraft();
     showPreviewBanner();
-    return fetch('/api/content/public')
+    var previousVersion = readCmsVersion();
+    var fetchUrl = '/api/content/public';
+    if (forceRefresh) fetchUrl += '?_=' + Date.now();
+    return fetch(fetchUrl, { cache: 'no-store' })
       .then(function (res) { return res.ok ? res.json() : null; })
       .then(function (data) {
+        if (data && data.version && data.version !== previousVersion) {
+          storeCmsVersion(data.version);
+        }
         if (data && data.content && draft) {
           data.content = mergePublicContent(data.content, draft);
         }

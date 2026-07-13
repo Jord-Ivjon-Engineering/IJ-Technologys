@@ -1,6 +1,8 @@
 import { el } from '../state.js';
 import { signOut } from '../auth.js';
 import { navigate } from '../router.js';
+import { refreshPublicSiteCache } from '../api.js';
+import { showToast } from './Toast.js';
 
 const NAV = [
   { group: 'Overview', items: [{ path: '/dashboard', label: 'Dashboard', icon: '▣' }] },
@@ -61,8 +63,25 @@ function buildShell() {
   });
 
   const account = el('div', { className: 'crm-nav-account' });
+  const refreshBtn = el('button', {
+    className: 'crm-nav-refresh',
+    type: 'button',
+    html: '<span class="crm-nav-icon">↻</span>Refresh site cache',
+  });
+  refreshBtn.addEventListener('click', async () => {
+    refreshBtn.disabled = true;
+    try {
+      await refreshPublicSiteCache();
+      showToast('Public site cache refreshed');
+    } catch (ex) {
+      showToast(ex.message || 'Refresh failed', 'error');
+    } finally {
+      refreshBtn.disabled = false;
+    }
+  });
   const logoutBtn = el('button', { className: 'crm-nav-logout', type: 'button', text: 'Log out' });
   logoutBtn.addEventListener('click', () => signOut());
+  account.appendChild(refreshBtn);
   account.appendChild(logoutBtn);
   sidebar.appendChild(account);
 

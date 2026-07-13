@@ -493,14 +493,16 @@ async function convertSubmissionToClient(id) {
 }
 
 async function getPublicContent() {
-  const [{ data, error }, { data: sectionRows, error: secErr }] = await Promise.all([
+  const [{ data, error }, { data: sectionRows, error: secErr }, { data: settingsMeta, error: settingsErr }] = await Promise.all([
     supabase.from('public_site_content').select('*').maybeSingle(),
     supabase.from('site_sections').select('slug, enabled'),
+    supabase.from('site_settings').select('updated_at').eq('id', true).maybeSingle(),
   ]);
   if (error) throw error;
   if (secErr) throw secErr;
+  if (settingsErr) throw settingsErr;
   if (!data) {
-    return { settings: {}, showcaseProjects: [], pricingPlans: [], sections: [] };
+    return { version: settingsMeta?.updated_at || null, settings: {}, showcaseProjects: [], pricingPlans: [], sections: [] };
   }
   const settings = data.settings || {};
   const vis = settings.visibility || {};
@@ -509,6 +511,7 @@ async function getPublicContent() {
     sectionVisibility[row.slug] = row.enabled !== false;
   });
   return {
+    version: settingsMeta?.updated_at || null,
     settings: {
       ...settings,
       projects: vis.projects || {},
@@ -519,6 +522,18 @@ async function getPublicContent() {
     pricingPlans: data.pricing || data.pricing_plans || [],
     sections: data.sections || [],
   };
+}
+
+async function touchPublicContentCache(userId) {
+  const now = new Date().toISOString();
+  const { data, error } = await supabase
+    .from('site_settings')
+    .update({ updated_at: now, updated_by: userId || null })
+    .eq('id', true)
+    .select('updated_at')
+    .maybeSingle();
+  if (error) throw error;
+  return data?.updated_at || now;
 }
 
 function settingsFromRow(data) {
@@ -777,6 +792,7 @@ module.exports = {
   updateSubmission,
   convertSubmissionToClient,
   getPublicContent,
+  touchPublicContentCache,
   getSiteSettings,
   updateSiteSettings,
   listShowcase,

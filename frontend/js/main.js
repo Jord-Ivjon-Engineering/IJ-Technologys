@@ -62,6 +62,7 @@ function setLang(lang){
   try{ localStorage.setItem('ij-lang', lang); }catch(e){}
   buildMarquees();
   if(typeof window.contactFormRefresh === 'function') window.contactFormRefresh();
+  if(typeof window.reviewsRefreshLang === 'function') window.reviewsRefreshLang();
 }
 document.getElementById('btn-en').addEventListener('click', ()=> setLang('en'));
 document.getElementById('btn-sq').addEventListener('click', ()=> setLang('sq'));
@@ -158,7 +159,25 @@ const io = new IntersectionObserver(es=>{
     }
   });
 },{ threshold:.12, rootMargin:'0px 0px -40px 0px' });
-document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
+function observeRevealElements(root){
+  const scope = root || document;
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  scope.querySelectorAll('.reveal:not(.in)').forEach(el=>{
+    if(el.dataset.revealObserved) return;
+    el.dataset.revealObserved = '1';
+    io.observe(el);
+    const rect = el.getBoundingClientRect();
+    if(rect.top < vh * 0.88 && rect.bottom > 0){
+      el.classList.add('in');
+      io.unobserve(el);
+    }
+  });
+}
+document.querySelectorAll('.reveal').forEach(el=>{
+  el.dataset.revealObserved = '1';
+  io.observe(el);
+});
+document.addEventListener('ij-cms-ready', ()=> observeRevealElements());
 
 const navLinks = document.querySelectorAll('.nav-links a, .mobile-menu a');
 const sections = ['about','projects','work','clients','offers','contact'].map(id=> document.getElementById(id)).filter(Boolean);
@@ -246,7 +265,7 @@ function scheduleProjectsOverhang() {
 }
 
 function bindCardOverhangWatchers() {
-  document.querySelectorAll('.pcard img, .pcard iframe').forEach(el => {
+  document.querySelectorAll('.pcard img').forEach(el => {
     if (el.dataset.overhangBound) return;
     el.dataset.overhangBound = '1';
     el.addEventListener('load', scheduleProjectsOverhang);
@@ -345,6 +364,39 @@ document.querySelectorAll('[data-plan]').forEach(link=>{
   });
 });
 
+(function heroCardTilt(){
+  if(REDUCED || isMobileDisplay()) return;
+  const holder = document.getElementById('hero3d');
+  if(!holder) return;
+  const spring = {rx:0, ry:0, vx:0, vy:0, tx:0, ty:0, s:1, vs:0, ts:1};
+  let hovering = false;
+  holder.addEventListener('pointerenter', ()=>{ hovering = true; });
+  holder.addEventListener('pointermove', e=>{
+    const r = holder.getBoundingClientRect();
+    const px = ((e.clientX - r.left) / r.width) - 0.5;
+    const py = ((e.clientY - r.top) / r.height) - 0.5;
+    spring.ty = px * 0.76;
+    spring.tx = -py * 0.52;
+    spring.ts = 1.03;
+  });
+  holder.addEventListener('pointerleave', ()=>{
+    hovering = false;
+    spring.tx = spring.ty = 0;
+    spring.ts = 1;
+  });
+  const K = 0.07, D = 0.88;
+  function frame(){
+    requestAnimationFrame(frame);
+    if(document.hidden && !hovering) return;
+    spring.vx += (spring.tx - spring.rx) * K; spring.vx *= D; spring.rx += spring.vx;
+    spring.vy += (spring.ty - spring.ry) * K; spring.vy *= D; spring.ry += spring.vy;
+    spring.vs += (spring.ts - spring.s) * K; spring.vs *= D; spring.s += spring.vs;
+    holder.style.transform =
+      `perspective(900px) rotateX(${spring.rx}rad) rotateY(${spring.ry}rad) scale(${spring.s})`;
+  }
+  frame();
+})();
+
 function makeDotTexture(color){
   const c = document.createElement('canvas'); c.width = c.height = 64;
   const g = c.getContext('2d');
@@ -378,6 +430,25 @@ function makeCodeTexture(w,h,fontSize,dense, cols, dimColor){
   return t;
 }
 
+function loadThreeJs(done){
+  if(REDUCED || isMobileDisplay()) return done();
+  if(typeof THREE !== 'undefined') return done();
+  var existing = document.getElementById('three-js');
+  if(existing){
+    if(typeof THREE !== 'undefined') return done();
+    existing.addEventListener('load', done, {once:true});
+    existing.addEventListener('error', done, {once:true});
+    return;
+  }
+  var s = document.createElement('script');
+  s.id = 'three-js';
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  s.onload = done;
+  s.onerror = done;
+  document.head.appendChild(s);
+}
+
+function initThreeScenes(){
 (function bgField(){
   if(REDUCED || isMobileDisplay() || typeof THREE === 'undefined') return;
   const canvas = document.getElementById('bgCanvas');
@@ -427,152 +498,6 @@ function makeCodeTexture(w,h,fontSize,dense, cols, dimColor){
     cam.position.x += (mx * 3 - cam.position.x) * .025;
     cam.position.y += (-my * 2.5 - cam.position.y) * .025;
     cam.lookAt(0,0,0);
-    renderer.render(scene, cam);
-  }
-  frame();
-})();
-
-(function heroCard(){
-  if(REDUCED || isMobileDisplay() || typeof THREE === 'undefined') return;
-  const holder = document.getElementById('hero3d');
-  const canvas = document.getElementById('cardCanvas');
-  const overlay = document.getElementById('cardOverlay');
-  const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
-  renderer.setPixelRatio(DPR);
-  const scene = new THREE.Scene();
-  const cam = new THREE.PerspectiveCamera(38, 1, .1, 50);
-  cam.position.z = 6.4;
-  function size(){
-    const r = holder.getBoundingClientRect();
-    renderer.setSize(r.width, r.height, false);
-    cam.aspect = r.width/r.height; cam.updateProjectionMatrix();
-  }
-  size(); addEventListener('resize', size);
-
-  const vert = `
-    uniform float uTime;
-    varying vec2 vUv;
-    varying float vWave;
-    float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-    float noise(vec2 p){
-      vec2 i=floor(p),f=fract(p);
-      f=f*f*(3.0-2.0*f);
-      return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),
-                 mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),f.x),f.y);
-    }
-    void main(){
-      vUv=uv;
-      vec3 p=position;
-      float n=noise(uv*3.0+uTime*0.2)+0.5*noise(uv*7.0-uTime*0.28);
-      float wave=sin(uv.x*6.283+uTime*0.75)*0.05+n*0.12;
-      p.z+=wave;
-      vWave=wave;
-      gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);
-    }`;
-  const frag = `
-    precision mediump float;
-    uniform float uTime;
-    uniform vec2 uMouse;
-    varying vec2 vUv;
-    varying float vWave;
-    float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-    float noise(vec2 p){
-      vec2 i=floor(p),f=fract(p);
-      f=f*f*(3.0-2.0*f);
-      return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),
-                 mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),f.x),f.y);
-    }
-    float fbm(vec2 p){
-      float v=0.0,a=0.5;
-      for(int i=0;i<4;i++){v+=a*noise(p);p*=2.1;a*=0.5;}
-      return v;
-    }
-    float roundRect(vec2 uv, vec2 halfSize, float r){
-      vec2 d=abs(uv-0.5)-halfSize+vec2(r);
-      return length(max(d,0.0))+min(max(d.x,d.y),0.0)-r;
-    }
-    void main(){
-      vec2 uv=vUv;
-      vec2 flow=uv*3.0+vec2(uTime*0.1,-uTime*0.07)+uMouse*0.28;
-      float n=fbm(flow);
-      float n2=fbm(flow*1.8+n*1.5);
-      vec3 cDeep=vec3(0.02,0.06,0.12);
-      vec3 cGreen=vec3(0.0,0.35,0.45);
-      vec3 cTeal=vec3(0.0,0.65,0.75);
-      vec3 cLight=vec3(0.35,0.92,1.0);
-      vec3 col=mix(cDeep,cGreen,smoothstep(0.25,0.75,n));
-      col=mix(col,cTeal,smoothstep(0.5,0.95,n2)*0.75);
-      float streak=pow(abs(sin((uv.x+uv.y)*7.0+n*8.0-uTime*0.6)),28.0);
-      col+=cLight*streak*0.45;
-      col+=cLight*smoothstep(0.1,0.18,vWave)*0.35;
-      float edge=smoothstep(0.32,0.5,distance(uv,vec2(0.5)));
-      col+=mix(cTeal,cLight,uv.y)*edge*0.35;
-      float d=roundRect(uv,vec2(0.46,0.44),0.09);
-      float alpha=1.0-smoothstep(0.0,0.012,d);
-      col+=cTeal*smoothstep(0.014,0.0,abs(d))*0.5;
-      gl_FragColor=vec4(col,alpha*0.94);
-    }`;
-  const cardMat = new THREE.ShaderMaterial({
-    vertexShader: vert, fragmentShader: frag, transparent: true,
-    uniforms: { uTime: {value:0}, uMouse: {value: new THREE.Vector2(0,0)} },
-    side: THREE.DoubleSide
-  });
-  const seg = [110,70];
-  const card = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 2.15, seg[0], seg[1]), cardMat);
-  const cardGroup = new THREE.Group();
-  cardGroup.add(card);
-  scene.add(cardGroup);
-
-  const orbTex = makeDotTexture('#00e8ff');
-  const orbs = [];
-  [[-2.1,1.1,.6,.09],[2.2,-.9,.4,.12],[1.6,1.4,-.5,.07],[-1.8,-1.3,.3,.1]].forEach(([x,y,z,s])=>{
-    const spr = new THREE.Sprite(new THREE.SpriteMaterial({map:orbTex, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, opacity:.75}));
-    spr.position.set(x,y,z); spr.scale.setScalar(s*6);
-    spr.userData = {x,y,z, ph: Math.random()*6.28};
-    scene.add(spr); orbs.push(spr);
-  });
-
-  const ray = new THREE.Raycaster(), pointer = new THREE.Vector2();
-  const spring = {rx:0, ry:0, vx:0, vy:0, tx:0, ty:0, s:1, vs:0, ts:1};
-  let hovering = false;
-  holder.addEventListener('pointermove', e=>{
-    const r = holder.getBoundingClientRect();
-    pointer.x = ((e.clientX - r.left)/r.width)*2 - 1;
-    pointer.y = -(((e.clientY - r.top)/r.height)*2 - 1);
-    spring.ty = pointer.x * 0.38;
-    spring.tx = -pointer.y * 0.26;
-    cardMat.uniforms.uMouse.value.set(pointer.x, pointer.y);
-    ray.setFromCamera(pointer, cam);
-    hovering = ray.intersectObject(card).length > 0;
-    spring.ts = hovering ? 1.04 : 1.0;
-  });
-  holder.addEventListener('pointerleave', ()=>{ spring.tx = spring.ty = 0; spring.ts = 1; hovering = false; });
-
-  const activeIO = new IntersectionObserver(es=>{ es.forEach(e=> visible.card = e.isIntersecting); }, {threshold:.05});
-  activeIO.observe(holder);
-
-  const K = 0.07, D = 0.88;
-  let t = 0;
-  function frame(){
-    requestAnimationFrame(frame);
-    if(!visible.card || document.hidden) return;
-    t += 0.014;
-    cardMat.uniforms.uTime.value = t;
-    spring.vx += (spring.tx - spring.rx) * K; spring.vx *= D; spring.rx += spring.vx;
-    spring.vy += (spring.ty - spring.ry) * K; spring.vy *= D; spring.ry += spring.vy;
-    spring.vs += (spring.ts - spring.s) * K; spring.vs *= D; spring.s += spring.vs;
-    cardGroup.rotation.x = spring.rx;
-    cardGroup.rotation.y = spring.ry;
-    cardGroup.scale.setScalar(spring.s);
-    cardGroup.position.y = Math.sin(t * 0.75) * 0.06;
-    cardGroup.rotation.z = Math.sin(t * 0.45) * 0.015;
-    overlay.style.transform =
-      `translate(-50%,-50%) perspective(900px) rotateX(${spring.rx*57.3*0.85}deg) rotateY(${spring.ry*57.3*0.85}deg) translateY(${Math.sin(t*0.75)*5}px) scale(${spring.s})`;
-    orbs.forEach(o=>{
-      const u = o.userData;
-      o.position.y = u.y + Math.sin(t * 0.85 + u.ph) * 0.18;
-      o.position.x = u.x + Math.cos(t * 0.55 + u.ph) * 0.12;
-    });
     renderer.render(scene, cam);
   }
   frame();
@@ -750,6 +675,10 @@ function makeCodeTexture(w,h,fontSize,dense, cols, dimColor){
   }
   frame();
 })();
+
+}
+
+loadThreeJs(initThreeScenes);
 
 initTheme();
 window.setLang = setLang;

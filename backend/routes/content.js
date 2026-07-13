@@ -7,8 +7,11 @@ const router = express.Router();
 
 router.get('/public', async (req, res, next) => {
   try {
-    const content = await getPublicContent();
-    res.json({ ok: true, content });
+    const data = await getPublicContent();
+    const { version, ...content } = data;
+    res.set('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.json({ ok: true, version, content });
   } catch (err) {
     next(err);
   }

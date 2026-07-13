@@ -16,6 +16,7 @@ const {
   createSection,
   updateSection,
   deleteSection,
+  touchPublicContentCache,
 } = require('../../lib/crmStore');
 
 const router = express.Router();
@@ -49,7 +50,16 @@ router.put('/settings', async (req, res, next) => {
       return res.status(400).json({ ok: false, error: 'settings object required.' });
     }
     const data = await updateSiteSettings(settings, req.adminUser?.id);
-    res.json({ ok: true, ...data });
+    res.json({ ok: true, ...data, contentVersion: data.updatedAt });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/refresh-cache', async (req, res, next) => {
+  try {
+    const contentVersion = await touchPublicContentCache(req.adminUser?.id);
+    res.json({ ok: true, contentVersion });
   } catch (err) {
     next(err);
   }
@@ -79,7 +89,8 @@ router.post('/showcase', async (req, res, next) => {
       });
     }
     const item = await createShowcase(body, req.adminUser?.id);
-    res.status(201).json({ ok: true, item });
+    const contentVersion = await touchPublicContentCache(req.adminUser?.id);
+    res.status(201).json({ ok: true, item, contentVersion });
   } catch (err) {
     next(err);
   }
@@ -97,7 +108,8 @@ router.patch('/showcase/:id', async (req, res, next) => {
     }
     const item = await updateShowcase(req.params.id, req.body || {}, req.adminUser?.id);
     if (!item) return res.status(404).json({ ok: false, error: 'Showcase item not found.' });
-    res.json({ ok: true, item });
+    const contentVersion = await touchPublicContentCache(req.adminUser?.id);
+    res.json({ ok: true, item, contentVersion });
   } catch (err) {
     next(err);
   }
@@ -107,7 +119,8 @@ router.delete('/showcase/:id', async (req, res, next) => {
   try {
     const removed = await deleteShowcase(req.params.id);
     if (!removed) return res.status(404).json({ ok: false, error: 'Showcase item not found.' });
-    res.json({ ok: true });
+    const contentVersion = await touchPublicContentCache(req.adminUser?.id);
+    res.json({ ok: true, contentVersion });
   } catch (err) {
     next(err);
   }
@@ -129,7 +142,8 @@ router.post('/pricing', async (req, res, next) => {
       return res.status(400).json({ ok: false, error: 'Validation failed.', fields: ['slug', 'name'] });
     }
     const plan = await createPricing(body, req.adminUser?.id);
-    res.status(201).json({ ok: true, plan });
+    const contentVersion = await touchPublicContentCache(req.adminUser?.id);
+    res.status(201).json({ ok: true, plan, contentVersion });
   } catch (err) {
     if (err.code === '23505') {
       return res.status(400).json({ ok: false, error: 'A plan with this slug already exists.' });
@@ -142,7 +156,8 @@ router.patch('/pricing/:id', async (req, res, next) => {
   try {
     const plan = await updatePricing(req.params.id, req.body || {}, req.adminUser?.id);
     if (!plan) return res.status(404).json({ ok: false, error: 'Pricing plan not found.' });
-    res.json({ ok: true, plan });
+    const contentVersion = await touchPublicContentCache(req.adminUser?.id);
+    res.json({ ok: true, plan, contentVersion });
   } catch (err) {
     next(err);
   }
@@ -152,7 +167,8 @@ router.delete('/pricing/:id', async (req, res, next) => {
   try {
     const removed = await deletePricing(req.params.id);
     if (!removed) return res.status(404).json({ ok: false, error: 'Pricing plan not found.' });
-    res.json({ ok: true });
+    const contentVersion = await touchPublicContentCache(req.adminUser?.id);
+    res.json({ ok: true, contentVersion });
   } catch (err) {
     next(err);
   }
@@ -174,7 +190,8 @@ router.post('/sections', async (req, res, next) => {
       return res.status(400).json({ ok: false, error: 'Validation failed.', fields: ['slug'] });
     }
     const section = await createSection(body, req.adminUser?.id);
-    res.status(201).json({ ok: true, section });
+    const contentVersion = await touchPublicContentCache(req.adminUser?.id);
+    res.status(201).json({ ok: true, section, contentVersion });
   } catch (err) {
     next(err);
   }
@@ -184,7 +201,8 @@ router.patch('/sections/:id', async (req, res, next) => {
   try {
     const section = await updateSection(req.params.id, req.body || {}, req.adminUser?.id);
     if (!section) return res.status(404).json({ ok: false, error: 'Section not found.' });
-    res.json({ ok: true, section });
+    const contentVersion = await touchPublicContentCache(req.adminUser?.id);
+    res.json({ ok: true, section, contentVersion });
   } catch (err) {
     next(err);
   }
@@ -194,7 +212,8 @@ router.delete('/sections/:id', async (req, res, next) => {
   try {
     const removed = await deleteSection(req.params.id);
     if (!removed) return res.status(404).json({ ok: false, error: 'Section not found.' });
-    res.json({ ok: true });
+    const contentVersion = await touchPublicContentCache(req.adminUser?.id);
+    res.json({ ok: true, contentVersion });
   } catch (err) {
     next(err);
   }

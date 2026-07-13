@@ -15,9 +15,6 @@
     document.documentElement.setAttribute('data-theme',t);
   }catch(e){document.documentElement.setAttribute('data-theme',mobile?'light':'dark');}
   document.documentElement.classList.add('js');
-  if(!mobile){
-    document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
-  }
 })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -91,13 +88,11 @@
       <div class="stats" data-cms="stats"></div>
     </div>
     <div class="hero3d reveal in d1" id="hero3d">
-      <canvas id="cardCanvas"></canvas>
       <div class="card-overlay" id="cardOverlay" aria-hidden="true">
         <div class="co-mark"><img src="/images/logo.png" alt=""></div>
         <p class="card-title" data-cms="hero.cardTitle"></p>
         <p class="card-meta" data-cms="hero.cardMeta"></p>
       </div>
-      <span class="hint hint-desktop"></span>
       <span class="hint hint-mobile"></span>
     </div>
   </div>

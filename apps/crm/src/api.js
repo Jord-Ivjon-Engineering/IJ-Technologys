@@ -1,6 +1,8 @@
 import { getAccessToken, getSupabase } from './auth.js';
 import { forceAuthExit, isAuthFailureStatus } from './sessionGuard.js';
 
+export const CMS_VERSION_KEY = 'ij-cms-version';
+
 class ApiError extends Error {
   constructor(message, status, body) {
     super(message);
@@ -30,7 +32,28 @@ async function request(path, options = {}) {
     throw new ApiError(body.error || 'Request failed', res.status, body);
   }
 
+  maybeNotifyPublicContentUpdate(path, options.method, body);
+
   return body;
+}
+
+export function notifyPublicContentUpdated(version) {
+  if (!version) return;
+  try { localStorage.setItem(CMS_VERSION_KEY, version); } catch (e) {}
+  window.postMessage({ type: 'ij-cms-content-updated', version }, window.location.origin);
+}
+
+function maybeNotifyPublicContentUpdate(path, method, body) {
+  if (!body || !body.contentVersion) return;
+  if (!/^\/content\/(settings|showcase|pricing|sections|refresh-cache)/.test(path)) return;
+  if (!method || method === 'GET') return;
+  notifyPublicContentUpdated(body.contentVersion);
+}
+
+export async function refreshPublicSiteCache() {
+  const body = await crmApi.post('/content/refresh-cache');
+  if (body.contentVersion) notifyPublicContentUpdated(body.contentVersion);
+  return body.contentVersion;
 }
 
 export const crmApi = {
