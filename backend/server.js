@@ -91,8 +91,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ ok: false, error: 'Internal server error.' });
 });
 
-app.listen(PORT, () => {
-  console.log(`IJ Technologys server running → http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`IJ Technologys server running → http://localhost:${PORT}`);
+  });
+}
 
 module.exports = app;

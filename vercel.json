@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "installCommand": "npm install && npm install --prefix apps/crm && npm run build:crm",
+  "builds": [
+    { "src": "api/index.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/api/index.js" }
+  ]
+}
