@@ -15,6 +15,31 @@ const { askAssistant, MAX_CHARS } = require('../lib/assistant');
 const router = express.Router();
 
 const MAX_MESSAGES = 24;
+const RATE_WINDOW_MS = 60 * 1000;
+const RATE_MAX = 20;
+const rateBuckets = new Map();
+
+function clientIp(req) {
+  const xf = req.headers['x-forwarded-for'];
+  if (typeof xf === 'string' && xf.trim()) return xf.split(',')[0].trim().slice(0, 64);
+  return String(req.ip || 'unknown').slice(0, 64);
+}
+
+function tooManyRequests(ip) {
+  const now = Date.now();
+  let bucket = rateBuckets.get(ip);
+  if (!bucket || now - bucket.start >= RATE_WINDOW_MS) {
+    bucket = { start: now, count: 0 };
+    rateBuckets.set(ip, bucket);
+  }
+  bucket.count += 1;
+  if (rateBuckets.size > 4000) {
+    for (const [key, value] of rateBuckets) {
+      if (now - value.start >= RATE_WINDOW_MS) rateBuckets.delete(key);
+    }
+  }
+  return bucket.count > RATE_MAX;
+}
 
 function sanitize(body) {
   const raw = Array.isArray(body && body.messages) ? body.messages : null;
@@ -37,13 +62,21 @@ function sanitize(body) {
 
 router.post('/', async (req, res, next) => {
   try {
+    if (tooManyRequests(clientIp(req))) {
+      return res.json({
+        ok: false,
+        reply:
+          'Please wait a moment before sending another message.' +
+          '\n\nJu lutem prisni një moment para se të dërgoni një mesazh tjetër.',
+      });
+    }
+
     const messages = sanitize(req.body || {});
     if (!messages) {
       return res.status(400).json({ ok: false, error: 'A user message is required.' });
     }
 
     const result = await askAssistant(messages);
-    // Always 200: `reply` is safe to display in both success and fallback cases.
     return res.json({ ok: result.ok, reply: result.reply });
   } catch (err) {
     next(err);
