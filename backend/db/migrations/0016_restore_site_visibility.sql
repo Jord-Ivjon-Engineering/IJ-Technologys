@@ -14,7 +14,7 @@ set
   }'::jsonb,
   footer = footer || '{}'::jsonb || '{
     "tagline": {"en": "A web studio building websites, shops and digital tools for businesses across the region.", "sq": "Një studio web që ndërton faqe, dyqane dhe mjete dixhitale për biznese në rajon."},
-    "copyright": {"en": "© 2026 IJ Technologys. All rights reserved.", "sq": "© 2026 IJ Technologys. Të gjitha të drejtat e rezervuara."},
+    "copyright": {"en": "© 2026 IJ Technology. All rights reserved.", "sq": "© 2026 IJ Technology. Të gjitha të drejtat e rezervuara."},
     "credit": {"en": "Designed and built by us.", "sq": "Dizenjuar dhe ndërtuar nga ne."},
     "requestCall": {"en": "Request a call", "sq": "Kërko një telefonatë"}
   }'::jsonb,

@@ -36,7 +36,7 @@ function buildShell() {
   const navLinks = [];
 
   sidebar.appendChild(el('div', { className: 'crm-brand' }, [
-    el('img', { src: '/images/logo.png', alt: 'IJ Technologys' }),
+    el('img', { src: '/images/logo.png', alt: 'IJ Technology' }),
     el('span', { text: 'CRM' }),
   ]));
 

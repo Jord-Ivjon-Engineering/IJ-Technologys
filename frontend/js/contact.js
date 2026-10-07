@@ -9,7 +9,7 @@
   const MSG = {
     sending: { en:'Sending…', sq:'Duke dërguar…' },
     ok: { en:'Thanks! We will reply within one business day.', sq:'Faleminderit! Do t\'ju kthehemi brenda një dite pune.' },
-    fail: { en:'Something went wrong. Please try again or email hello@ijtechnologys.com.', sq:'Diçka shkoi keq. Provoni sërish ose dërgoni email te hello@ijtechnologys.com.' },
+    fail: { en:'Something went wrong. Please try again or email hello@ijTechnology.com.', sq:'Diçka shkoi keq. Provoni sërish ose dërgoni email te hello@ijTechnology.com.' },
   };
 
   const FIELD_MSG = {

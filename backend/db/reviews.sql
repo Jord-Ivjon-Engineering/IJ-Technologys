@@ -1,4 +1,4 @@
--- IJ Technologys — reviews table (Postgres / Supabase)
+-- IJ Technology — reviews table (Postgres / Supabase)
 --
 -- Run this in the Supabase SQL editor (or `supabase db push`) to create the
 -- table that backs /api/reviews. A review is only shown publicly when it is

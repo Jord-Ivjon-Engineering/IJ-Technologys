@@ -1,8 +1,8 @@
-# IJ Technologys
+# IJ Technology
 
 
 
-A marketing site for **IJ Technologys** â€” a web studio building websites, online shops and custom digital products.
+A marketing site for **IJ Technology** â€” a web studio building websites, online shops and custom digital products.
 
 
 
@@ -341,5 +341,5 @@ Review moderation previously used `ADMIN_TOKEN` on `/api/reviews/pending` â€�
 
 
 
-Â© 2026 IJ Technologys. All rights reserved.
+Â© 2026 IJ Technology. All rights reserved.
 

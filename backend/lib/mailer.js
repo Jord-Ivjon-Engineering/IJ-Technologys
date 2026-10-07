@@ -19,7 +19,7 @@ const RESEND_ENDPOINT = 'https://api.resend.com/emails';
 const {
   RESEND_API_KEY,
   CONTACT_NOTIFY_TO,
-  CONTACT_FROM = 'IJ Technologys <onboarding@resend.dev>',
+  CONTACT_FROM = 'IJ Technology <onboarding@resend.dev>',
 } = process.env;
 
 let warnedMissingConfig = false;

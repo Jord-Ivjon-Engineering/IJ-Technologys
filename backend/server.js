@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * IJ Technologys — backend server.
+ * IJ Technology — backend server.
  * Serves the static frontend and exposes a small JSON API
  * (contact form + client reviews, both backed by Supabase).
  */
@@ -56,7 +56,7 @@ app.use(express.json({ limit: '16kb' }));
 
 /* ---- API ---- */
 app.get('/api/health', (req, res) => {
-  res.json({ ok: true, service: 'ij-technologys', time: new Date().toISOString() });
+  res.json({ ok: true, service: 'ij-Technology', time: new Date().toISOString() });
 });
 app.use('/api/contact', contactRouter);
 app.use('/api/reviews', reviewsRouter);
@@ -115,7 +115,7 @@ app.use((err, req, res, next) => {
 
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
-    console.log(`IJ Technologys server running → http://localhost:${PORT}`);
+    console.log(`IJ Technology server running → http://localhost:${PORT}`);
   });
 }
 

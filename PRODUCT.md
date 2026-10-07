@@ -8,11 +8,11 @@ brand
 
 Local and regional business owners — shops, guesthouses, restaurants, and small service companies — often non-technical, busy, and deciding on a phone or laptop between other work. They need a studio that feels trustworthy enough to hand over their online presence.
 
-Primary job: understand what IJ Technologys builds, see proof it works for businesses like theirs, pick a clear package, and send a contact message (or call/email) without friction.
+Primary job: understand what IJ Technology builds, see proof it works for businesses like theirs, pick a clear package, and send a contact message (or call/email) without friction.
 
 ## Product Purpose
 
-IJ Technologys is a bilingual (English / Albanian) marketing landing page for a web studio that designs and builds websites, online shops, and custom digital products. Success is a confident visitor who trusts the studio and converts via the contact form or direct contact channels.
+IJ Technology is a bilingual (English / Albanian) marketing landing page for a web studio that designs and builds websites, online shops, and custom digital products. Success is a confident visitor who trusts the studio and converts via the contact form or direct contact channels.
 
 ## Brand Personality
 

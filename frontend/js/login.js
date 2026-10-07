@@ -152,8 +152,8 @@ async function boot() {
       if (err.status === 403) {
         await sb.auth.signOut();
         setStatus(document.documentElement.lang === 'sq'
-          ? 'Llogaria juaj nuk ka akses. Kontaktoni IJ Technologys.'
-          : 'Your account is not authorized. Contact IJ Technologys.', true);
+          ? 'Llogaria juaj nuk ka akses. Kontaktoni IJ Technology.'
+          : 'Your account is not authorized. Contact IJ Technology.', true);
       } else {
         setStatus(err.message || (document.documentElement.lang === 'sq' ? 'Hyrja dështoi.' : 'Sign in failed.'), true);
       }
