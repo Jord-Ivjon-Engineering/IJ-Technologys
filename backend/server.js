@@ -17,6 +17,16 @@ const contentRouter = require('./routes/content');
 const authRouter = require('./routes/auth');
 const crmRouter = require('./routes/crm');
 const assistantRouter = require('./routes/assistant');
+const { getPublicContent } = require('./lib/crmStore');
+const { readPublicReviews } = require('./lib/store');
+const {
+  templateHtml,
+  buildHomeHtml,
+  renderRobots,
+  renderSitemap,
+  renderLlms,
+  renderNotFound,
+} = require('./lib/publicPage');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -93,16 +103,73 @@ app.get('/index.html', (req, res) => {
   res.redirect(301, '/');
 });
 
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send(renderRobots());
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  res.type('application/xml').send(renderSitemap());
+});
+
+app.get('/llms.txt', async (req, res) => {
+  try {
+    const published = await loadPublished();
+    res.type('text/plain; charset=utf-8').send(renderLlms(published.content, published.reviews));
+  } catch (err) {
+    console.error(err);
+    res.type('text/plain; charset=utf-8').send('# IJ Technology\n\nhttps://www.ij-technology.com/\n');
+  }
+});
+
+app.get('/', (req, res) => {
+  sendHome(res, 'en');
+});
+
+app.get('/sq', (req, res) => {
+  const pathOnly = req.originalUrl.split('?')[0];
+  if (pathOnly.length > 1 && pathOnly.endsWith('/')) {
+    return res.redirect(301, '/sq');
+  }
+  sendHome(res, 'sq');
+});
+
 app.use('/crm', express.static(CRM_DIST_DIR));
 app.get('/crm/*', (req, res) => {
   res.sendFile(CRM_INDEX_FILE);
 });
 
-app.use(express.static(FRONTEND_DIR));
+app.use(express.static(FRONTEND_DIR, { index: false }));
 
-app.get(/^\/(?!api\/|crm\/|login|portal|admin).*/, (req, res) => {
-  res.sendFile(path.join(FRONTEND_DIR, 'index.html'));
+app.use((req, res) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ ok: false, error: 'Not found.' });
+  }
+  res.status(404).set('X-Robots-Tag', 'noindex').type('html').send(renderNotFound());
 });
+
+async function loadPublished() {
+  const [content, reviews] = await Promise.all([
+    getPublicContent(),
+    readPublicReviews().catch((err) => {
+      console.error(err);
+      return [];
+    }),
+  ]);
+  return { content, reviews };
+}
+
+function sendHome(res, lang) {
+  loadPublished()
+    .then((published) => {
+      res.set('Cache-Control', 'private, no-cache');
+      res.type('html').send(buildHomeHtml(templateHtml(), published.content, published.reviews, lang));
+    })
+    .catch((err) => {
+      console.error(err);
+      res.set('Cache-Control', 'private, no-cache');
+      res.sendFile(path.join(FRONTEND_DIR, 'index.html'));
+    });
+}
 
 /* ---- error handler (e.g. malformed JSON) ---- */
 app.use((err, req, res, next) => {

@@ -48,10 +48,12 @@ function setLang(lang){
     const tag = el.tagName;
     if(tag === 'INPUT' || tag === 'TEXTAREA'){
       if(el.hasAttribute('placeholder')) el.placeholder = t;
+    }else if(tag === 'IMG'){
+      el.alt = t;
     }else if(tag === 'OPTION'){
       el.textContent = t;
     }else{
-      el.innerHTML = t;
+      el.textContent = t;
     }
   });
   ['btn-en','btn-sq','btn-en-menu','btn-sq-menu'].forEach(id=>{

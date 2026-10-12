@@ -1,12 +1,11 @@
 'use strict';
 
 const express = require('express');
-const { saveReview, readReviews } = require('../lib/store');
+const { saveReview, readPublicReviews } = require('../lib/store');
 
 const router = express.Router();
 
 const LIMITS = { name: 80, role: 80, text: 600 };
-const MAX_PUBLIC = 60;
 const MIN_PUBLIC_RATING = 4;
 
 function clean(str) {
@@ -34,12 +33,7 @@ function toPublic(r) {
 
 router.get('/', async (req, res, next) => {
   try {
-    const all = await readReviews();
-    const reviews = all
-      .filter((r) => r.approved && r.rating >= MIN_PUBLIC_RATING)
-      .reverse()
-      .slice(0, MAX_PUBLIC)
-      .map(toPublic);
+    const reviews = (await readPublicReviews()).map(toPublic);
     res.json({ ok: true, reviews });
   } catch (err) {
     next(err);

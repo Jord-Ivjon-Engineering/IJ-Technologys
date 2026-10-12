@@ -265,16 +265,26 @@
     ring.innerHTML = '';
     if (!items || !items.length) return;
     items.forEach(function (item, i) {
-      var article = document.createElement('article');
-      article.className = 'pcard';
-      article.style.setProperty('--i', String(i));
+      var titleText = typeof item.title === 'object' ? (item.title.en || item.title.sq || '') : (item.title || '');
+      var linkUrl = safeHttpUrl(item.embedUrl);
+      var card = document.createElement(linkUrl ? 'a' : 'article');
+      card.className = 'pcard' + (linkUrl ? ' pcard-link' : '');
+      card.style.setProperty('--i', String(i));
+      if (linkUrl) {
+        card.href = linkUrl;
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
+      }
       var thumb = document.createElement('div');
       thumb.className = 'thumb';
-      var titleText = typeof item.title === 'object' ? (item.title.en || item.title.sq || '') : (item.title || '');
       var img = document.createElement('img');
       img.loading = 'lazy';
       img.src = item.imageUrl || '';
       img.alt = titleText;
+      if (typeof item.title === 'object') {
+        if (item.title.en) img.setAttribute('data-en', item.title.en);
+        if (item.title.sq) img.setAttribute('data-sq', item.title.sq);
+      }
       if (!item.imageUrl) thumb.classList.add('thumb-empty');
       thumb.appendChild(img);
       var body = document.createElement('div');
@@ -291,21 +301,9 @@
       body.appendChild(tag);
       body.appendChild(h3);
       body.appendChild(p);
-      article.appendChild(thumb);
-      article.appendChild(body);
-      var linkUrl = safeHttpUrl(item.embedUrl);
-      if (linkUrl) {
-        article.classList.add('pcard-link');
-        article.setAttribute('role', 'link');
-        article.setAttribute('tabindex', '0');
-        article.setAttribute('aria-label', titleText ? titleText + ' — open project' : 'Open project');
-        var openLink = function () { window.open(linkUrl, '_blank', 'noopener,noreferrer'); };
-        article.addEventListener('click', openLink);
-        article.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLink(); }
-        });
-      }
-      ring.appendChild(article);
+      card.appendChild(thumb);
+      card.appendChild(body);
+      ring.appendChild(card);
     });
     if (typeof window.ijSyncRing === 'function') window.ijSyncRing();
   }
@@ -489,7 +487,10 @@
         var suitImg = document.querySelector('.suit-img img');
         if (suitImg) {
           suitImg.src = sec.suitImage;
-          suitImg.alt = '';
+          if (sec.suitTitle && sec.suitTitle.en) suitImg.setAttribute('data-en', sec.suitTitle.en);
+          if (sec.suitTitle && sec.suitTitle.sq) suitImg.setAttribute('data-sq', sec.suitTitle.sq);
+          var suitLang = document.documentElement.lang === 'sq' ? 'sq' : 'en';
+          suitImg.alt = (sec.suitTitle && (sec.suitTitle[suitLang] || sec.suitTitle.en || sec.suitTitle.sq)) || '';
         }
       }
       if (sec.suitCta) {
@@ -668,14 +669,37 @@
     document.body.prepend(bar);
   }
 
+  function readEmbeddedContent() {
+    var el = document.getElementById('ij-public-content');
+    if (!el || !el.textContent) return null;
+    try {
+      var data = JSON.parse(el.textContent);
+      return data && data.ok ? data : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function preferredLang() {
+    var lang = document.documentElement.lang === 'sq' ? 'sq' : 'en';
+    try {
+      var saved = localStorage.getItem('ij-lang');
+      if (saved === 'en' || saved === 'sq') lang = saved;
+    } catch (e) {}
+    return lang;
+  }
+
   window.ijLoadCmsContent = function (forceRefresh) {
     var draft = readPreviewDraft();
     showPreviewBanner();
     var previousVersion = readCmsVersion();
     var fetchUrl = '/api/content/public';
     if (forceRefresh) fetchUrl += '?_=' + Date.now();
-    return fetch(fetchUrl, { cache: 'no-store' })
-      .then(function (res) { return res.ok ? res.json() : null; })
+    var embedded = !forceRefresh && !isPreviewMode() ? readEmbeddedContent() : null;
+    var pending = embedded
+      ? Promise.resolve(embedded)
+      : fetch(fetchUrl, { cache: 'no-store' }).then(function (res) { return res.ok ? res.json() : null; });
+    return pending
       .then(function (data) {
         if (data && data.version && data.version !== previousVersion) {
           storeCmsVersion(data.version);
@@ -686,11 +710,7 @@
         var normalized = normalizePayload(data);
         if (normalized && applyContent(normalized)) {
           window.ijCmsLoaded = true;
-          if (typeof window.setLang === 'function') {
-            var lang = 'en';
-            try { lang = localStorage.getItem('ij-lang') || 'en'; } catch (e) {}
-            window.setLang(lang);
-          }
+          if (typeof window.setLang === 'function') window.setLang(preferredLang());
         }
         return normalized;
       })

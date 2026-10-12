@@ -86,6 +86,18 @@ async function readReviews() {
   return data.map(reviewFromRow);
 }
 
+async function readPublicReviews() {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('id, name, role, text, rating, created_at')
+    .eq('approved', true)
+    .gte('rating', 4)
+    .order('created_at', { ascending: false })
+    .limit(60);
+  if (error) throw error;
+  return data.map(reviewFromRow);
+}
+
 async function updateReview(id, patch) {
   const { data, error } = await supabase
     .from('reviews')
@@ -108,4 +120,4 @@ async function deleteReview(id) {
   return Boolean(data); // false when no row matched
 }
 
-module.exports = { saveSubmission, saveReview, readReviews, updateReview, deleteReview };
+module.exports = { saveSubmission, saveReview, readReviews, readPublicReviews, updateReview, deleteReview };

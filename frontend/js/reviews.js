@@ -65,19 +65,34 @@
     render();
   }
 
-  /* ---- load existing reviews ---- */
-  fetch('/api/reviews')
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if(data && data.ok && Array.isArray(data.reviews) && data.reviews.length){
-        data.reviews.forEach(function(r){ items.push(r); });
-      }
-    })
-    .catch(function(){})
-    .finally(function(){
-      reviewsLoaded = true;
-      render();
-    });
+  function readEmbeddedReviews(){
+    var el = document.getElementById('ij-public-reviews');
+    if(!el || !el.textContent) return null;
+    try {
+      var data = JSON.parse(el.textContent);
+      if(data && data.ok && Array.isArray(data.reviews)) return data.reviews;
+    } catch(e) {}
+    return null;
+  }
+  var embeddedReviews = readEmbeddedReviews();
+  if(embeddedReviews){
+    embeddedReviews.forEach(function(r){ items.push(r); });
+    reviewsLoaded = true;
+    render();
+  }else{
+    fetch('/api/reviews')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if(data && data.ok && Array.isArray(data.reviews) && data.reviews.length){
+          data.reviews.forEach(function(r){ items.push(r); });
+        }
+      })
+      .catch(function(){})
+      .finally(function(){
+        reviewsLoaded = true;
+        render();
+      });
+  }
 
   window.reviewsRefreshLang = function(){
     if(!items.length && reviewsLoaded) render();
